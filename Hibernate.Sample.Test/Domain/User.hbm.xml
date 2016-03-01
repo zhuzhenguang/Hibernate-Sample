@@ -1,0 +1,20 @@
+﻿<?xml version="1.0" encoding="utf-8" ?>
+
+<hibernate-mapping xmlns="urn:nhibernate-mapping-2.2" 
+                   namespace="Hibernate.Sample.Test.Domain"
+                   assembly="Hibernate.Sample.Test.Domain" 
+                   auto-import="true">
+
+  <class name="User" table="t_user">
+
+    <id name="Id" column="Id">
+      <generator class="seqhilo">
+        <param name="sequence">hi_value</param>
+        <param name="max_lo">100</param>
+      </generator>
+    </id>
+
+    <property name="Name" column="Name"/>
+  </class>
+
+</hibernate-mapping>
