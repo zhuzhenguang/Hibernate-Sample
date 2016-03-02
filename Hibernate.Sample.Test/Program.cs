@@ -1,17 +1,29 @@
-﻿using Hibernate.Sample.Test.Common;
+﻿using System;
+using Hibernate.Sample.Test.Common;
 using Hibernate.Sample.Test.Domain;
+using log4net;
 using Xunit;
 
-namespace Hibernate.Sample.Test.DomainTests
+namespace Hibernate.Sample.Test
 {
-    public class UserFacts : TestBase
+    public class Program: TestBase
     {
-        [Fact]
-        public void should_save_user()
+        private static ILog logger = LogManager.GetLogger(typeof (Program));
+
+        public static void Main()
+        {
+            new Program()
+                //.TestInsertUser();
+                .TestInsertUserPassport();
+
+            Console.ReadLine();
+        }
+
+        public void TestInsertUser()
         {
             DeleteAllTalbes();
 
-            var user = new User {Name = "Zhu"};
+            var user = new User { Name = "Zhu" };
 
             var session = GetSession();
             var transaction = session.BeginTransaction();
@@ -23,17 +35,14 @@ namespace Hibernate.Sample.Test.DomainTests
                 session.Flush();
                 transaction.Commit();
             }
-
-            Assert.True(user.Id > 0);
         }
 
-        [Fact]
-        public void should_save_user_passport()
+        public void TestInsertUserPassport()
         {
             DeleteAllTalbes();
 
-            var user = new User {Name = "Zhu"};
-            var passport = new Passport {Serial = "df890890", Expiry = "20190101"};
+            var user = new User { Name = "Zhu" };
+            var passport = new Passport { Serial = "df890890", Expiry = "20190101" };
 
             user.Passport = passport;
             passport.User = user;
@@ -46,17 +55,16 @@ namespace Hibernate.Sample.Test.DomainTests
             }
 
             var user2 = GetSession().Get<User>(user.Id);
-            Assert.Equal("20190101", user2.Passport.Expiry);
-            Assert.Equal("df890890", user2.Passport.Serial);
+            logger.Info(user2.Passport.Serial);
+            logger.Info(user2.Passport.Expiry);
         }
 
-        [Fact]
-        public void should_save_user_group()
+        public void TestInsertUserGroup()
         {
             DeleteAllTalbes();
 
-            var user = new User {Name = "Zhu"};
-            var group = new Group {Name = "Admin Group"};
+            var user = new User { Name = "Zhu" };
+            var group = new Group { Name = "Admin Group" };
 
             user.Group = group;
 
@@ -67,8 +75,7 @@ namespace Hibernate.Sample.Test.DomainTests
                 transaction.Commit();
             }
 
-            Assert.True(user.Id > 0);
-            Assert.True(group.Id > 0);
+            GetSession().Get<User>(user.Id);
         }
     }
 }
