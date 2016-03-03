@@ -15,3 +15,10 @@ create table t_user(
   id bigint identity(1,1) primary key,
   name nvarchar(512),
   );
+
+  create table t_address(
+  id bigint identity(1,1) primary key,
+  address nvarchar(512),
+  zipcode varchar(200),
+  user_id bigint FOREIGN KEY REFERENCES t_user(id)
+  );

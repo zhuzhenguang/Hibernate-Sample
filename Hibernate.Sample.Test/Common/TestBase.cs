@@ -22,7 +22,7 @@ namespace Hibernate.Sample.Test.Common
 
         protected void DeleteAllTalbes()
         {
-            var tables = new[] {"Passport", "User"};
+            var tables = new[] {"Passport", "Address", "User"};
 
             var session = GetSession();
             using (var transaction = session.BeginTransaction())

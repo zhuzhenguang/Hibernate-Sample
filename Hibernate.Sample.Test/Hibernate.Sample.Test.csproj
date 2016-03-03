@@ -80,6 +80,7 @@
   <ItemGroup>
     <Compile Include="Common\TestBase.cs" />
     <Compile Include="DomainTests\UserFacts.cs" />
+    <Compile Include="Domain\Address.cs" />
     <Compile Include="Domain\Group.cs" />
     <Compile Include="Domain\Passport.cs" />
     <Compile Include="Domain\User.cs" />
@@ -107,6 +108,12 @@
   <ItemGroup>
     <EmbeddedResource Include="Domain\Group.hbm.xml">
       <SubType>Designer</SubType>
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </EmbeddedResource>
+  </ItemGroup>
+  <ItemGroup>
+    <Content Include="create.sql" />
+    <EmbeddedResource Include="Domain\Address.hbm.xml">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </EmbeddedResource>
   </ItemGroup>

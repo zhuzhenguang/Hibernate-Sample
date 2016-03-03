@@ -1,0 +1,22 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+
+<hibernate-mapping xmlns="urn:nhibernate-mapping-2.2">
+  <class name="Address" table="t_address">
+    <id name="Id" column="Id">
+      <generator class="identity" />
+    </id>
+
+    <property name="AddressDetail" column="Address" />
+    <property name="ZipCode" column="ZipCode" />
+    <many-to-one 
+      name="User" 
+      class="User" 
+      cascade="none" 
+      outer-join="auto" 
+      update="true" 
+      insert="true"
+      access="property" 
+      column="user_id" 
+      not-null="true" />
+  </class>
+</hibernate-mapping>

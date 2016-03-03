@@ -1,4 +1,5 @@
-﻿using Hibernate.Sample.Test.Common;
+﻿using System.Linq;
+using Hibernate.Sample.Test.Common;
 using Hibernate.Sample.Test.Domain;
 using Xunit;
 
@@ -69,6 +70,53 @@ namespace Hibernate.Sample.Test.DomainTests
 
             Assert.True(user.Id > 0);
             Assert.True(group.Id > 0);
+        }
+
+        [Fact]
+        public void should_save_user_address()
+        {
+            DeleteAllTalbes();
+
+            var user = new User {Name = "Zhu"};
+            var address = new Address {ZipCode = "100101", AddressDetail = "Beijing Dongzhimen"};
+            user.Addresses.Add(address);
+
+            var session = GetSession();
+            using (var transaction = session.BeginTransaction())
+            {
+                session.Save(user);
+                transaction.Commit();
+            }
+
+            Assert.True(user.Id > 0);
+            Assert.NotEmpty(user.Addresses);
+            Assert.True(user.Addresses.First().Id > 0);
+        }
+
+        [Fact]
+        public void should_save_user_address_two_ways()
+        {
+            DeleteAllTalbes();
+
+            var user = new User { Name = "Zhu" };
+            var address = new Address
+            {
+                ZipCode = "100101",
+                AddressDetail = "Beijing Dongzhimen",
+                User = user
+            };
+            user.Addresses.Add(address);
+
+            var session = GetSession();
+            using (var transaction = session.BeginTransaction())
+            {
+                session.Save(user);
+                transaction.Commit();
+            }
+
+            Assert.True(user.Id > 0);
+            Assert.NotEmpty(user.Addresses);
+            Assert.True(user.Addresses.First().Id > 0);
         }
     }
 }

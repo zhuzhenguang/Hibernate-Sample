@@ -2,7 +2,6 @@
 using Hibernate.Sample.Test.Common;
 using Hibernate.Sample.Test.Domain;
 using log4net;
-using Xunit;
 
 namespace Hibernate.Sample.Test
 {
@@ -14,7 +13,9 @@ namespace Hibernate.Sample.Test
         {
             new Program()
                 //.TestInsertUser();
-                .TestInsertUserPassport();
+                //.TestInsertUserPassport();
+                //.TestInsertUserAddress();
+                .TestInsertUserAddressTwoWays();
 
             Console.ReadLine();
         }
@@ -76,6 +77,40 @@ namespace Hibernate.Sample.Test
             }
 
             GetSession().Get<User>(user.Id);
+        }
+
+        public void TestInsertUserAddress()
+        {
+            DeleteAllTalbes();
+
+            var user = new User { Name = "Zhu" };
+            var address = new Address { ZipCode = "100101", AddressDetail = "Beijing Dongzhimen" };
+            user.Addresses.Add(address);
+
+            var session = GetSession();
+            using (var transaction = session.BeginTransaction())
+            {
+                session.Save(user);
+                transaction.Commit();
+            }
+
+            //GetSession().Get<User>(user.Id);
+        }
+
+        public void TestInsertUserAddressTwoWays()
+        {
+            DeleteAllTalbes();
+
+            var user = new User { Name = "Zhu" };
+            var address = new Address { ZipCode = "100101", AddressDetail = "Beijing Dongzhimen", User = user};
+            user.Addresses.Add(address);
+
+            var session = GetSession();
+            using (var transaction = session.BeginTransaction())
+            {
+                session.Save(user);
+                transaction.Commit();
+            }
         }
     }
 }
