@@ -79,10 +79,12 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Common\TestBase.cs" />
+    <Compile Include="DomainTests\GroupRoleFacts.cs" />
     <Compile Include="DomainTests\UserFacts.cs" />
     <Compile Include="Domain\Address.cs" />
     <Compile Include="Domain\Group.cs" />
     <Compile Include="Domain\Passport.cs" />
+    <Compile Include="Domain\Role.cs" />
     <Compile Include="Domain\User.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
@@ -113,6 +115,9 @@
   </ItemGroup>
   <ItemGroup>
     <Content Include="create.sql" />
+    <EmbeddedResource Include="Domain\Role.hbm.xml">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </EmbeddedResource>
     <EmbeddedResource Include="Domain\Address.hbm.xml">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </EmbeddedResource>

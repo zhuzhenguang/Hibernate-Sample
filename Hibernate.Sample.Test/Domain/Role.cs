@@ -1,17 +1,16 @@
 ﻿using System.Collections.Generic;
-using System.Dynamic;
 
 namespace Hibernate.Sample.Test.Domain
 {
-    public class Group
+    public class Role
     {
-        public Group()
+        public Role()
         {
-            Roles = new HashSet<Role>();
+            Groups = new HashSet<Group>();
         }
 
         public virtual long Id { get; set; }
         public virtual string Name { get; set; }
-        public virtual ICollection<Role> Roles { get; set; }
+        public virtual ICollection<Group> Groups { get; set; } 
     }
 }

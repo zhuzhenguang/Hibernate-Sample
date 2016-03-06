@@ -109,6 +109,11 @@ namespace Hibernate.Sample.Test
             using (var transaction = session.BeginTransaction())
             {
                 session.Save(user);
+
+                //address.User = null;
+                //user.Addresses.Remove(address);
+
+                //session.Save(user);
                 transaction.Commit();
             }
         }

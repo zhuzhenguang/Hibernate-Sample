@@ -1,0 +1,16 @@
+﻿<?xml version="1.0" encoding="utf-8" ?>
+
+<hibernate-mapping xmlns="urn:nhibernate-mapping-2.2">
+  <class name="Role" table="t_role" dynamic-update="false" dynamic-insert="false">
+    <id name="Id" column="Id">
+      <generator class="identity" />
+    </id>
+
+    <property name="Name" column="Name" />
+    
+    <set name="Groups" table="t_group_role" lazy="false" inverse="true" cascade="save-update">
+      <key column="role_id"></key>
+      <many-to-many class="Group" column="group_id" outer-join="auto"/>
+    </set>
+  </class>
+</hibernate-mapping>
