@@ -24,6 +24,6 @@ create table t_user(
   );
 
   create table t_group_role(
-  group_id bigint,
-  role_id bigint
+  group_id bigint FOREIGN KEY REFERENCES t_group(id),
+  role_id bigint FOREIGN KEY REFERENCES t_role(id)
   );

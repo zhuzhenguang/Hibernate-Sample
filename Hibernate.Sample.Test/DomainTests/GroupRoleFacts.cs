@@ -59,5 +59,11 @@ namespace Hibernate.Sample.Test.DomainTests
             Assert.True(group2.Id > 0);
             Assert.True(group3.Id > 0);
         }
+
+        [Fact]
+        public void should_delete()
+        {
+            DeleteAllTalbes();
+        }
     }
 }

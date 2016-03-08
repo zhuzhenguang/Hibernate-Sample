@@ -8,7 +8,7 @@
 
     <property name="Name" column="Name" />
 
-    <set name="Roles" table="t_group_role" lazy="false" inverse="false" cascade="all">
+    <set name="Roles" table="t_group_role" lazy="false" inverse="false" cascade="save-update">
       <key column="group_id"></key>
       <many-to-many class="Role" column="role_id" />
     </set>

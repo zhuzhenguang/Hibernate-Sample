@@ -23,7 +23,7 @@ namespace Hibernate.Sample.Test.Common
 
         protected void DeleteAllTalbes()
         {
-            var tables = new[] { "Passport", "Address", "User", "Hibernate.Sample.Test.Domain.Group" };
+            var tables = new[] { "Passport", "Address", "User", "Hibernate.Sample.Test.Domain.Group", "Hibernate.Sample.Test.Domain.Role" };
 
             var session = GetSession();
             using (var transaction = session.BeginTransaction())
@@ -51,6 +51,7 @@ namespace Hibernate.Sample.Test.Common
             {
                 @group.Roles = null;
                 session.Save(@group);
+                //session.Delete(@group);
             }
         }
 
