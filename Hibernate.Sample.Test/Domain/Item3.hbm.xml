@@ -1,0 +1,17 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+
+<hibernate-mapping xmlns="urn:nhibernate-mapping-2.2">
+  <class name="Hibernate.Sample.Test.Domain.Item3" table="t_item3">
+    <id name="Id" column="Id">
+      <generator class="identity" />
+    </id>
+    
+    <discriminator column="category" type="string"/>
+
+    <subclass name="Dvd3" discriminator-value="1">
+    </subclass>
+
+    <subclass name="Book3" discriminator-value="2">
+    </subclass>
+  </class>
+</hibernate-mapping>

@@ -1,7 +1,10 @@
 ﻿using System;
+using System.Linq;
 using Hibernate.Sample.Test.Common;
 using Hibernate.Sample.Test.Domain;
 using log4net;
+using NHibernate.Linq;
+using Xunit;
 
 namespace Hibernate.Sample.Test
 {
@@ -15,7 +18,8 @@ namespace Hibernate.Sample.Test
                 //.TestInsertUser();
                 //.TestInsertUserPassport();
                 //.TestInsertUserAddress();
-                .TestInsertUserAddressTwoWays();
+                //.TestInsertUserAddressTwoWays();
+                .TestItem3();
 
             Console.ReadLine();
         }
@@ -116,6 +120,61 @@ namespace Hibernate.Sample.Test
                 //session.Save(user);
                 transaction.Commit();
             }
+        }
+
+        private void TestItem1()
+        {
+            DeleteAllTalbes();
+
+            var book = new Book1 { Manufacturer = "a press", Name = "ring load", PageCount = 200 };
+            var dvd = new Dvd1 { Manufacturer = "b press", Name = "sonata", RegionCode = "10220303" };
+
+            var session = GetSession();
+            using (var tranaction = session.BeginTransaction())
+            {
+                session.Save(book);
+                session.Save(dvd);
+                tranaction.Commit();
+            }
+
+            session.Query<Item1>().ToList();
+        }
+
+        private void TestItem2()
+        {
+            DeleteAllTalbes();
+
+            var book = new Book2 { Manufacturer = "a press", Name = "ring load", PageCount = 200 };
+            var dvd = new Dvd3 { Manufacturer = "b press", Name = "sonata", RegionCode = "10220303" };
+
+            var session = GetSession();
+            using (var tranaction = session.BeginTransaction())
+            {
+                session.Save(book);
+                session.Save(dvd);
+                tranaction.Commit();
+            }
+
+            session.Query<Item2>().ToList();
+        }
+
+        private void TestItem3()
+        {
+            DeleteAllTalbes();
+
+            var book = new Book3 { Manufacturer = "a press", Name = "ring load", PageCount = 200 };
+            var dvd = new Dvd3 { Manufacturer = "b press", Name = "sonata", RegionCode = "10220303" };
+
+            var session = GetSession();
+            using (var tranaction = session.BeginTransaction())
+            {
+                session.Save(book);
+                session.Save(dvd);
+                tranaction.Commit();
+            }
+
+            session.Query<Book3>().ToList();
+            session.Query<Dvd3>().ToList();
         }
     }
 }

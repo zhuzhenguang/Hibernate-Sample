@@ -80,9 +80,13 @@
   <ItemGroup>
     <Compile Include="Common\TestBase.cs" />
     <Compile Include="DomainTests\GroupRoleFacts.cs" />
+    <Compile Include="DomainTests\ItemFacts.cs" />
     <Compile Include="DomainTests\UserFacts.cs" />
     <Compile Include="Domain\Address.cs" />
     <Compile Include="Domain\Group.cs" />
+    <Compile Include="Domain\Item1.cs" />
+    <Compile Include="Domain\Item2.cs" />
+    <Compile Include="Domain\Item3.cs" />
     <Compile Include="Domain\Passport.cs" />
     <Compile Include="Domain\Role.cs" />
     <Compile Include="Domain\User.cs" />
@@ -115,6 +119,18 @@
   </ItemGroup>
   <ItemGroup>
     <Content Include="create.sql" />
+    <EmbeddedResource Include="Domain\Item3.hbm.xml">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Domain\Item2.hbm.xml">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Domain\Book1.hbm.xml">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Domain\Dvd1.hbm.xml">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </EmbeddedResource>
     <EmbeddedResource Include="Domain\Role.hbm.xml">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </EmbeddedResource>

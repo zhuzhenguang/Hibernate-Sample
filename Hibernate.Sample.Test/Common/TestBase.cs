@@ -1,4 +1,5 @@
-﻿using System.IO;
+﻿using System;
+using System.IO;
 using FluentNHibernate.Conventions;
 using Hibernate.Sample.Test.Domain;
 using NHibernate;
@@ -23,7 +24,18 @@ namespace Hibernate.Sample.Test.Common
 
         protected void DeleteAllTalbes()
         {
-            var tables = new[] { "Passport", "Address", "User", "Hibernate.Sample.Test.Domain.Group", "Hibernate.Sample.Test.Domain.Role" };
+            var tables = new[]
+            {
+                "Passport", 
+                "Address", 
+                "User", 
+                "Hibernate.Sample.Test.Domain.Group", 
+                "Hibernate.Sample.Test.Domain.Role",
+                "Book1",
+                "Dvd1",
+                "Item2",
+                "Item3"
+            };
 
             var session = GetSession();
             using (var transaction = session.BeginTransaction())
@@ -37,6 +49,7 @@ namespace Hibernate.Sample.Test.Common
 
                 transaction.Commit();
             }
+            Console.WriteLine("====================");
         }
 
         private static void DeleteGroup(ISession session)
