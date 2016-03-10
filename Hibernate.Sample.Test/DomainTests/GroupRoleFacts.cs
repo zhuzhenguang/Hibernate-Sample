@@ -4,7 +4,7 @@ using Xunit;
 
 namespace Hibernate.Sample.Test.DomainTests
 {
-    public class GroupRoleFacts: TestBase
+    public class GroupRoleFacts : TestBase
     {
         [Fact]
         public void should_save_group_role()
@@ -15,9 +15,9 @@ namespace Hibernate.Sample.Test.DomainTests
             var role2 = new Role {Name = "Role2"};
             var role3 = new Role {Name = "Role3"};
 
-            var group1 = new Group{Name = "Group1"};
-            var group2 = new Group{Name = "Group2"};
-            var group3 = new Group{Name = "Group3"};
+            var group1 = new Group {Name = "Group1"};
+            var group2 = new Group {Name = "Group2"};
+            var group3 = new Group {Name = "Group3"};
 
             group1.Roles.Add(role1);
             group1.Roles.Add(role2);
@@ -43,7 +43,7 @@ namespace Hibernate.Sample.Test.DomainTests
                 session.Save(role1);
                 session.Save(role2);
                 session.Save(role3);
-                
+
                 session.Save(group1);
                 session.Save(group2);
                 session.Save(group3);

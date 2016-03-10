@@ -12,7 +12,7 @@ namespace Hibernate.Sample.Test.DomainTests
         {
             DeleteAllTalbes();
 
-            var user = new User {Name = "Zhu"};
+            var user = new User("Zhu");
 
             var session = GetSession();
             var transaction = session.BeginTransaction();
@@ -33,7 +33,7 @@ namespace Hibernate.Sample.Test.DomainTests
         {
             DeleteAllTalbes();
 
-            var user = new User {Name = "Zhu"};
+            var user = new User("Zhu");
             var passport = new Passport {Serial = "df890890", Expiry = "20190101"};
 
             user.Passport = passport;
@@ -56,7 +56,7 @@ namespace Hibernate.Sample.Test.DomainTests
         {
             DeleteAllTalbes();
 
-            var user = new User {Name = "Zhu"};
+            var user = new User("Zhu");
             var group = new Group {Name = "Admin Group"};
 
             user.Group = group;
@@ -77,9 +77,9 @@ namespace Hibernate.Sample.Test.DomainTests
         {
             DeleteAllTalbes();
 
-            var user = new User {Name = "Zhu"};
+            var user = new User("Zhu");
             var address = new Address {ZipCode = "100101", AddressDetail = "Beijing Dongzhimen"};
-            user.Addresses.Add(address);
+            user.AddAddress(address);
 
             var session = GetSession();
             using (var transaction = session.BeginTransaction())
@@ -89,8 +89,8 @@ namespace Hibernate.Sample.Test.DomainTests
             }
 
             Assert.True(user.Id > 0);
-            Assert.NotEmpty(user.Addresses);
-            Assert.True(user.Addresses.First().Id > 0);
+            Assert.NotEmpty(user.Contact.Addresses);
+            Assert.True(user.Contact.Addresses.First().Id > 0);
         }
 
         [Fact]
@@ -98,14 +98,14 @@ namespace Hibernate.Sample.Test.DomainTests
         {
             DeleteAllTalbes();
 
-            var user = new User { Name = "Zhu" };
+            var user = new User("Zhu");
             var address = new Address
             {
                 ZipCode = "100101",
                 AddressDetail = "Beijing Dongzhimen",
                 User = user
             };
-            user.Addresses.Add(address);
+            user.AddAddress(address);
 
             var session = GetSession();
             using (var transaction = session.BeginTransaction())
@@ -115,8 +115,8 @@ namespace Hibernate.Sample.Test.DomainTests
             }
 
             Assert.True(user.Id > 0);
-            Assert.NotEmpty(user.Addresses);
-            Assert.True(user.Addresses.First().Id > 0);
+            Assert.NotEmpty(user.Contact.Addresses);
+            Assert.True(user.Contact.Addresses.First().Id > 0);
         }
     }
 }

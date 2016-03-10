@@ -6,17 +6,22 @@
       <generator class="identity" />
     </id>
 
-    <property name="Name" column="Name" />
+    <component name="Name" class="Hibernate.Sample.Test.Domain.Name">
+      <property name="FirstName" type="string" column="first_name" />
+      <property name="LastName" type="string" column="last_name" />
+    </component>
 
-    <set 
-      name="Addresses" 
-      table="t_address" 
-      cascade="all" 
-      inverse="true"
-      lazy="false">
-      <key column="user_id"></key>
-      <one-to-many class="Address" />
-    </set>
+    <component name="Contact" class="Hibernate.Sample.Test.Domain.Contact">
+      <set
+        name="Addresses"
+        table="t_address"
+        cascade="all"
+        inverse="true"
+        lazy="false">
+        <key column="user_id"></key>
+        <one-to-many class="Address" />
+      </set>
+    </component>
 
     <one-to-one name="Passport" class="Passport" cascade="all" outer-join="true" />
     <many-to-one name="Group" class="Group" column="group_id" unique="true" cascade="all" />

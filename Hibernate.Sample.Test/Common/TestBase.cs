@@ -66,6 +66,7 @@ namespace Hibernate.Sample.Test.Common
                 session.Save(@group);
                 //session.Delete(@group);
             }
+            session.Flush();
         }
 
         protected ISession GetSession()

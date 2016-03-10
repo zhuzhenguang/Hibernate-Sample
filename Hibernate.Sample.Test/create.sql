@@ -1,6 +1,7 @@
 create table t_user(
   id bigint identity(1,1) primary key,
-  name nvarchar(512),
+  first_name nvarchar(512),
+  last_name nvarchar(512),
   age int,
   group_id int
 );
@@ -14,6 +15,13 @@ create table t_passport(
 create table t_group(
   id bigint identity(1,1) primary key,
   name nvarchar(512)
+);
+
+create table t_address(
+  id bigint identity(1,1) primary key,
+  address nvarchar(512),
+  zipcode nvarchar(512),
+  user_id bigint FOREIGN KEY REFERENCES t_user(id)
 );
 
 alter table t_address alter column user_id bigint not null;
