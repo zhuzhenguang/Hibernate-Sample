@@ -118,5 +118,22 @@ namespace Hibernate.Sample.Test.DomainTests
             Assert.NotEmpty(user.Contact.Addresses);
             Assert.True(user.Contact.Addresses.First().Id > 0);
         }
+
+        [Fact]
+        public void should_save_query_user_with_resume()
+        {
+            DeleteAllTalbes();
+
+            var user = new UserWithResume("Zhu") {Resume = "My name is Zhu."};
+
+            var session = GetSession();
+            using (var transaction = session.BeginTransaction())
+            {
+                session.Save(user);
+                transaction.Commit();
+            }
+
+            Assert.True(user.Id > 0);
+        }
     }
 }

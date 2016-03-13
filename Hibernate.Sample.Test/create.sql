@@ -75,3 +75,5 @@ create table t_item3(
   regioncode varchar(30),
   category int
 );
+
+alter table t_user add resume nvarchar(max);

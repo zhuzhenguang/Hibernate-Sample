@@ -4,11 +4,10 @@ using Hibernate.Sample.Test.Common;
 using Hibernate.Sample.Test.Domain;
 using log4net;
 using NHibernate.Linq;
-using Xunit;
 
 namespace Hibernate.Sample.Test
 {
-    public class Program: TestBase
+    public class Program : TestBase
     {
         private static ILog logger = LogManager.GetLogger(typeof (Program));
 
@@ -19,7 +18,10 @@ namespace Hibernate.Sample.Test
                 //.TestInsertUserPassport();
                 //.TestInsertUserAddress();
                 //.TestInsertUserAddressTwoWays();
-                .TestItem3();
+                //.TestItem3();
+                //.TestUserWithResume();
+                //.TestUserWithDifferentFetchMethod();
+                .TesteUserWithBatchLoading();
 
             Console.ReadLine();
         }
@@ -47,7 +49,7 @@ namespace Hibernate.Sample.Test
             DeleteAllTalbes();
 
             var user = new User("Zhu");
-            var passport = new Passport { Serial = "df890890", Expiry = "20190101" };
+            var passport = new Passport {Serial = "df890890", Expiry = "20190101"};
 
             user.Passport = passport;
             passport.User = user;
@@ -69,7 +71,7 @@ namespace Hibernate.Sample.Test
             DeleteAllTalbes();
 
             var user = new User("Zhu");
-            var group = new Group { Name = "Admin Group" };
+            var group = new Group {Name = "Admin Group"};
 
             user.Group = group;
 
@@ -88,7 +90,7 @@ namespace Hibernate.Sample.Test
             DeleteAllTalbes();
 
             var user = new User("Zhu");
-            var address = new Address { ZipCode = "100101", AddressDetail = "Beijing Dongzhimen" };
+            var address = new Address {ZipCode = "100101", AddressDetail = "Beijing Dongzhimen"};
             user.AddAddress(address);
 
             var session = GetSession();
@@ -97,8 +99,6 @@ namespace Hibernate.Sample.Test
                 session.Save(user);
                 transaction.Commit();
             }
-
-            //GetSession().Get<User>(user.Id);
         }
 
         public void TestInsertUserAddressTwoWays()
@@ -106,7 +106,7 @@ namespace Hibernate.Sample.Test
             DeleteAllTalbes();
 
             var user = new User("Zhu");
-            var address = new Address { ZipCode = "100101", AddressDetail = "Beijing Dongzhimen", User = user};
+            var address = new Address {ZipCode = "100101", AddressDetail = "Beijing Dongzhimen", User = user};
             user.AddAddress(address);
 
             var session = GetSession();
@@ -126,8 +126,8 @@ namespace Hibernate.Sample.Test
         {
             DeleteAllTalbes();
 
-            var book = new Book1 { Manufacturer = "a press", Name = "ring load", PageCount = 200 };
-            var dvd = new Dvd1 { Manufacturer = "b press", Name = "sonata", RegionCode = "10220303" };
+            var book = new Book1 {Manufacturer = "a press", Name = "ring load", PageCount = 200};
+            var dvd = new Dvd1 {Manufacturer = "b press", Name = "sonata", RegionCode = "10220303"};
 
             var session = GetSession();
             using (var tranaction = session.BeginTransaction())
@@ -144,8 +144,8 @@ namespace Hibernate.Sample.Test
         {
             DeleteAllTalbes();
 
-            var book = new Book2 { Manufacturer = "a press", Name = "ring load", PageCount = 200 };
-            var dvd = new Dvd3 { Manufacturer = "b press", Name = "sonata", RegionCode = "10220303" };
+            var book = new Book2 {Manufacturer = "a press", Name = "ring load", PageCount = 200};
+            var dvd = new Dvd3 {Manufacturer = "b press", Name = "sonata", RegionCode = "10220303"};
 
             var session = GetSession();
             using (var tranaction = session.BeginTransaction())
@@ -162,8 +162,8 @@ namespace Hibernate.Sample.Test
         {
             DeleteAllTalbes();
 
-            var book = new Book3 { Manufacturer = "a press", Name = "ring load", PageCount = 200 };
-            var dvd = new Dvd3 { Manufacturer = "b press", Name = "sonata", RegionCode = "10220303" };
+            var book = new Book3 {Manufacturer = "a press", Name = "ring load", PageCount = 200};
+            var dvd = new Dvd3 {Manufacturer = "b press", Name = "sonata", RegionCode = "10220303"};
 
             var session = GetSession();
             using (var tranaction = session.BeginTransaction())
@@ -175,6 +175,82 @@ namespace Hibernate.Sample.Test
 
             session.Query<Book3>().ToList();
             session.Query<Dvd3>().ToList();
+        }
+
+        private void TestUserWithResume()
+        {
+            DeleteAllTalbes();
+
+            var user = new UserWithResume("Zhu") {Resume = "My name is Zhu."};
+
+            var session = GetSession();
+            using (var transaction = session.BeginTransaction())
+            {
+                session.Save(user);
+                transaction.Commit();
+            }
+
+            session.Query<UserWithResume>().ToList();
+            session.Query<object>().ToList();
+        }
+
+        // Immediate Load
+        // Lazy Load
+        // Eager Load
+        private void TestUserWithDifferentFetchMethod()
+        {
+            DeleteAllTalbes();
+
+            var user = new User("Zhu");
+            var address = new Address { ZipCode = "100101", AddressDetail = "Beijing Dongzhimen", User = user};
+            user.AddAddress(address);
+
+            var session = GetSession();
+            using (var transaction = session.BeginTransaction())
+            {
+                session.Save(user);
+                transaction.Commit();
+            }
+
+            var searchedUser = GetSession().Get<User>(user.Id);
+            Console.WriteLine("Query finished..........");
+            Console.WriteLine("Last name: {0}", searchedUser.Name.LastName);
+            var addresses = searchedUser.Contact.Addresses;
+            foreach (var address1 in addresses)
+            {
+                Console.WriteLine("Address: {0}", address1.AddressDetail);
+            }
+        }
+
+        // Batch Load
+        private void TesteUserWithBatchLoading()
+        {
+            DeleteAllTalbes();
+
+            var user1 = new User("Zhu");
+            var user2 = new User("ZhuZhu");
+            var address1 = new Address { ZipCode = "100101", AddressDetail = "Beijing Dongzhimen", User = user1 };
+            var address2 = new Address { ZipCode = "100102", AddressDetail = "Beijing Xizhimen", User = user1 };
+            user1.AddAddress(address1);
+            user2.AddAddress(address2);
+
+            var session = GetSession();
+            using (var transaction = session.BeginTransaction())
+            {
+                session.Save(user1);
+                session.Save(user2);
+                transaction.Commit();
+            }
+
+            var searchedUsers = GetSession().Query<User>().ToList();
+            foreach (var searchedUser in searchedUsers)
+            {
+                var addresses = searchedUser.Contact.Addresses;
+                foreach (var address in addresses)
+                {
+                    Console.WriteLine("Address: {0}", address.AddressDetail);
+                }
+            }
         }
     }
 }
