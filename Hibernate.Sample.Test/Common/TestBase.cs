@@ -34,7 +34,8 @@ namespace Hibernate.Sample.Test.Common
                 "Book1",
                 "Dvd1",
                 "Item2",
-                "Item3"
+                "Item3",
+                "User2"
             };
 
             var session = GetSession();

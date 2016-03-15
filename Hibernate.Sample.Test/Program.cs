@@ -21,12 +21,15 @@ namespace Hibernate.Sample.Test
                 //.TestItem3();
                 //.TestUserWithResume();
                 //.TestUserWithDifferentFetchMethod();
-                .TesteUserWithBatchLoading();
+                //.TesteUserWithBatchLoading();
+                //.TestPersistent();
+                //.TestDetached();
+                .TestPersistenceException();
 
             Console.ReadLine();
         }
 
-        public void TestInsertUser()
+        private void TestInsertUser()
         {
             DeleteAllTalbes();
 
@@ -44,7 +47,7 @@ namespace Hibernate.Sample.Test
             }
         }
 
-        public void TestInsertUserPassport()
+        private void TestInsertUserPassport()
         {
             DeleteAllTalbes();
 
@@ -66,7 +69,7 @@ namespace Hibernate.Sample.Test
             logger.Info(user2.Passport.Expiry);
         }
 
-        public void TestInsertUserGroup()
+        private void TestInsertUserGroup()
         {
             DeleteAllTalbes();
 
@@ -85,7 +88,7 @@ namespace Hibernate.Sample.Test
             GetSession().Get<User>(user.Id);
         }
 
-        public void TestInsertUserAddress()
+        private void TestInsertUserAddress()
         {
             DeleteAllTalbes();
 
@@ -101,7 +104,7 @@ namespace Hibernate.Sample.Test
             }
         }
 
-        public void TestInsertUserAddressTwoWays()
+        private void TestInsertUserAddressTwoWays()
         {
             DeleteAllTalbes();
 
@@ -202,7 +205,7 @@ namespace Hibernate.Sample.Test
             DeleteAllTalbes();
 
             var user = new User("Zhu");
-            var address = new Address { ZipCode = "100101", AddressDetail = "Beijing Dongzhimen", User = user};
+            var address = new Address {ZipCode = "100101", AddressDetail = "Beijing Dongzhimen", User = user};
             user.AddAddress(address);
 
             var session = GetSession();
@@ -229,8 +232,8 @@ namespace Hibernate.Sample.Test
 
             var user1 = new User("Zhu");
             var user2 = new User("ZhuZhu");
-            var address1 = new Address { ZipCode = "100101", AddressDetail = "Beijing Dongzhimen", User = user1 };
-            var address2 = new Address { ZipCode = "100102", AddressDetail = "Beijing Xizhimen", User = user1 };
+            var address1 = new Address {ZipCode = "100101", AddressDetail = "Beijing Dongzhimen", User = user1};
+            var address2 = new Address {ZipCode = "100102", AddressDetail = "Beijing Xizhimen", User = user1};
             user1.AddAddress(address1);
             user2.AddAddress(address2);
 
@@ -250,6 +253,77 @@ namespace Hibernate.Sample.Test
                 {
                     Console.WriteLine("Address: {0}", address.AddressDetail);
                 }
+            }
+        }
+
+        private void TestTransient()
+        {
+            var user = new User("Zhu");
+        }
+
+        private void TestPersistent()
+        {
+            var user1 = new User("Zhu");
+            var user2 = new User("ZhuZhu");
+
+            var session = GetSession();
+            using (var tx1 = session.BeginTransaction())
+            {
+                session.Save(user1);
+                tx1.Commit();
+            }
+
+            using (var tx2 = session.BeginTransaction())
+            {
+                user1.Name = new Name {FirstName = "Ming", LastName = "Jiao"};
+                user2.Name = new Name {FirstName = "Ming", LastName = "Jiao"};
+                tx2.Commit();
+            }
+        }
+
+        // if id is null
+        // if id is unsaved-value
+        // if version is null
+        // if version is unsaved-value
+        // interceptor.isUnsaved
+        private void TestDetached()
+        {
+            var user = new User("Zhu");
+
+            var session1 = GetSession();
+            using (var tx1 = session1.BeginTransaction())
+            {
+                session1.Save(user);
+                tx1.Commit();
+            }
+
+            session1.Close();
+
+            var session2 = GetSession();
+            using (var tx2 = session2.BeginTransaction())
+            {
+                session2.Save(user);
+                tx2.Commit();
+            }
+        }
+
+        private void TestPersistenceException()
+        {
+            DeleteAllTalbes();
+
+            var user2 = new User2 {Id = 1, Name = "Zhu"};
+
+            var session = GetSession();
+            using (var tx = session.BeginTransaction())
+            {
+                session.Save(user2);
+                tx.Commit();
+            }
+
+            using (var tx = session.BeginTransaction())
+            {
+                session.Update(new User2 {Id = user2.Id, Name = user2.Name});
+                tx.Commit();
             }
         }
     }

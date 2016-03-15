@@ -77,3 +77,8 @@ create table t_item3(
 );
 
 alter table t_user add resume nvarchar(max);
+
+create table t_user2(
+  id bigint primary key,
+  name nvarchar(512)
+);

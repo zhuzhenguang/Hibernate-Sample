@@ -90,6 +90,7 @@
     <Compile Include="Domain\Passport.cs" />
     <Compile Include="Domain\Role.cs" />
     <Compile Include="Domain\User.cs" />
+    <Compile Include="Domain\User2.cs" />
     <Compile Include="Domain\UserWithResume.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
@@ -120,6 +121,10 @@
   </ItemGroup>
   <ItemGroup>
     <Content Include="create.sql" />
+    <EmbeddedResource Include="Domain\User2.hbm.xml">
+      <SubType>Designer</SubType>
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </EmbeddedResource>
     <EmbeddedResource Include="Domain\UserWithResume.hbm.xml">
       <SubType>Designer</SubType>
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
