@@ -216,5 +216,94 @@ namespace Hibernate.Sample.Test.DomainTests
             var users = GetSession().Query<User>().ToList();
             Assert.Equal(0, users.Count);
         }
+
+        // entity key
+        [Fact]
+        public void should_recognize_identity()
+        {
+            DeleteAllTalbes();
+            PrepareUser2();
+
+            var session = GetSession();
+
+            var user1 = session.Load<User2>(1L);
+            user1.Name = "Jiao";
+
+            var user2 = session.Load<User2>(1L);
+
+            Assert.True(user1 == user2);
+        }
+
+        // override equal/hashcode with id
+        [Fact]
+        public void should_save_address()
+        {
+            DeleteAllTalbes();
+
+            var user = new User("Zhu");
+            user.AddAddress(new Address {AddressDetail = "dongzhimen", User = user});
+            user.AddAddress(new Address {AddressDetail = "xizhimen", User = user});
+            var session = GetSession();
+            using (var tx = session.BeginTransaction())
+            {
+                session.Save(user);
+                tx.Commit();
+            }
+            session.Close();
+
+            var searchedUser = GetSession().Get<User>(user.Id);
+            Assert.Equal(2, searchedUser.Contact.Addresses.Count);
+        }
+
+        // not override equal hashcode
+        [Fact]
+        public void should_save_across_session()
+        {
+            DeleteAllTalbes();
+            var userId = PrepareUserAndAddress();
+
+            var session1 = GetSession();
+            var user1 = session1.Load<User>(userId);
+            Assert.Equal(2, user1.Contact.Addresses.Count);
+            var address1 = user1.Contact.Addresses.First();
+            session1.Close();
+
+            ////////////////////////////////////////////////
+
+            var session2 = GetSession();
+            var user2 = session2.Load<User>(userId);
+            user2.AddAddress(address1);
+            Assert.Equal(2, user2.Contact.Addresses.Count);
+            session2.Save(user2);
+            session2.Flush();
+            session2.Close();
+        }
+
+        private long PrepareUserAndAddress()
+        {
+            var user = new User("Zhu");
+            user.AddAddress(new Address {AddressDetail = "dongzhimen", User = user});
+            user.AddAddress(new Address {AddressDetail = "xizhimen", User = user});
+
+            var session = GetSession();
+            using (var tx = session.BeginTransaction())
+            {
+                session.Save(user);
+                tx.Commit();
+            }
+            session.Close();
+            return user.Id;
+        }
+
+        private void PrepareUser2()
+        {
+            var session1 = GetSession();
+            using (var tx = session1.BeginTransaction())
+            {
+                session1.Save(new User2 {Id = 1, Name = "Zhu"});
+                tx.Commit();
+            }
+            session1.Close();
+        }
     }
 }
