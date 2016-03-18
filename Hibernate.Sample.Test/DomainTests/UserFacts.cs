@@ -279,6 +279,28 @@ namespace Hibernate.Sample.Test.DomainTests
             session2.Close();
         }
 
+        [Fact]
+        public void should_save_address_using_unsaved_value()
+        {
+            DeleteAllTalbes();
+
+            var user = new User("Zhu");
+            user.AddAddress(new Address { AddressDetail = "dongzhimen", User = user});
+
+            var session = GetSession();
+            using (var tx = session.BeginTransaction())
+            {
+                session.Save(user);
+                tx.Commit();
+            }
+            session.Close();
+
+            var users = GetSession().Query<User>().ToList();
+            Assert.Equal(1, users.Count);
+            Assert.Equal(1, users.First().Contact.Addresses.Count);
+            Assert.True(users.First().Contact.Addresses.First().Id != 2);
+        }
+
         private long PrepareUserAndAddress()
         {
             var user = new User("Zhu");
