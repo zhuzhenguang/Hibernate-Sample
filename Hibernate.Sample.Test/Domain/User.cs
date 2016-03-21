@@ -9,6 +9,15 @@ namespace Hibernate.Sample.Test.Domain
             Name = new Name {LastName = lastName};
         }
 
+        public User(User user, params Address[] addresses) : this()
+        {
+            Name = new Name {FirstName = user.Name.FirstName, LastName = user.Name.LastName};
+            foreach (var address in addresses)
+            {
+                AddAddress(address);
+            }
+        }
+
         public User()
         {
             Contact = new Contact();
@@ -24,6 +33,8 @@ namespace Hibernate.Sample.Test.Domain
         {
             Contact.Addresses.Add(address);
         }
+
+
     }
 
     public class Name

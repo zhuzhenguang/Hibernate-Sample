@@ -82,3 +82,5 @@ create table t_user2(
   id bigint primary key,
   name nvarchar(512)
 );
+
+alter table t_address alter column user_id bigint null;
