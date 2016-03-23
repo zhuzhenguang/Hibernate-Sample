@@ -24,7 +24,13 @@ namespace Hibernate.Sample.Test
                 //.TesteUserWithBatchLoading();
                 //.TestPersistent();
                 //.TestDetached();
-                .TestPersistenceException();
+                //.TestPersistenceException();
+                //.TestInnerJoinWithHql();
+                //.TestInnerJoinWithIQueryable();
+                //.TestInnerJoinWithLinq();
+                //.TestLeftJoinWithHql();
+                //.TestLeftJoinWithIQueryable();
+                .TestRightJoinWithHql();
 
             Console.ReadLine();
         }
@@ -325,6 +331,128 @@ namespace Hibernate.Sample.Test
                 session.Update(new User2 {Id = user2.Id, Name = user2.Name});
                 tx.Commit();
             }
+        }
+
+        private void TestInnerJoinWithHql()
+        {
+            DeleteAllTalbes();
+
+            PrepareUserAddressData();
+
+            var session = GetSession();
+            var users =
+                session.CreateQuery("from User user inner join fetch user.Contact.Addresses")
+                    .List<User>()
+                    .Distinct()
+                    .ToList();
+        }
+
+        // WorkBalanceController.QueryTaskAssignmentsByCommonRequest()
+        private void TestInnerJoinWithIQueryable()
+        {
+            DeleteAllTalbes();
+
+            PrepareUserAddressData();
+
+            var session = GetSession();
+            var users = session.Query<User>();
+            var addresses = session.Query<Address>();
+            var searchedUser =
+                users.Join(
+                    addresses,
+                    user => user,
+                    address => address.User,
+                    (user, address) => new User(user, address))
+                    .Distinct()
+                    .ToList();
+        }
+
+        private void TestInnerJoinWithLinq()
+        {
+            DeleteAllTalbes();
+
+            PrepareUserAddressData();
+
+            var session = GetSession();
+            var users = session.Query<User>().Where(user => user.Contact.Addresses.Count > 0).ToList();
+        }
+
+        private void TestLeftJoinWithHql()
+        {
+            DeleteAllTalbes();
+
+            PrepareUserAddressData();
+
+            var session = GetSession();
+            var users = session.CreateQuery("from User user left join fetch user.Contact.Addresses").List<User>();
+        }
+
+        private void TestLeftJoinWithIQueryable()
+        {
+            DeleteAllTalbes();
+
+            PrepareUserAddressData();
+
+            var session = GetSession();
+            var addresses = session.Query<Address>().ToList();
+            var users = session.Query<User>().ToList();
+            var searchedUsers = users
+                .GroupJoin(
+                    addresses,
+                    user => user,
+                    address => address.User,
+                    (user, addressList) => new { User = user, Addresses = addressList })
+                .SelectMany(
+                    ua => ua.Addresses.DefaultIfEmpty(),
+                    (ua, address) =>
+                    {
+                        var user = ua.User;
+                        if (address != null)
+                        {
+                            user.AddAddress(address);
+                        }
+                        return user;
+                    })
+                .ToList();
+        }
+
+        private void TestRightJoinWithHql()
+        {
+            DeleteAllTalbes();
+
+            PrepareUserAddressData();
+
+            var session = GetSession();
+            var users = session.CreateQuery("from User user right join fetch user.Contact.Addresses").List<User>();
+        }
+
+        private void PrepareUserAddressData()
+        {
+            Console.WriteLine("=========================insert data start=========================");
+            var user1 = new User("Zhu");
+            user1.AddAddress(new Address { AddressDetail = "Shanghai", User = user1 });
+            user1.AddAddress(new Address { AddressDetail = "Beijing", User = user1 });
+
+            var user2 = new User("Jiao");
+            user2.AddAddress(new Address { AddressDetail = "GuangZhou", User = user2 });
+
+            var user3 = new User("ZhuZhu");
+            var user4 = new User("JiaoJiao");
+            var address = new Address { AddressDetail = "Hongkongs" };
+
+            var session = GetSession();
+            using (var tx = session.BeginTransaction())
+            {
+                session.Save(user1);
+                session.Save(user2);
+                session.Save(user3);
+                session.Save(user4);
+                session.Save(address);
+                tx.Commit();
+            }
+            session.Close();
+            Console.WriteLine("=========================insert data end=========================");
+            Console.WriteLine();
         }
     }
 }

@@ -81,6 +81,7 @@
     <Compile Include="Common\TestBase.cs" />
     <Compile Include="DomainTests\GroupRoleFacts.cs" />
     <Compile Include="DomainTests\ItemFacts.cs" />
+    <Compile Include="DomainTests\JoinFacts.cs" />
     <Compile Include="DomainTests\UserFacts.cs" />
     <Compile Include="Domain\Address.cs" />
     <Compile Include="Domain\Group.cs" />
