@@ -115,18 +115,10 @@ namespace Hibernate.Sample.Test.DomainTests
                     addresses,
                     user => user,
                     address => address.User,
-                    (user, addressList) => new { User = user, Addresses = addressList })
+                    (user, addressList) => new User(user, addressList.ToArray()))
                 .SelectMany(
-                    ua => ua.Addresses.DefaultIfEmpty(),
-                    (ua, address) =>
-                    {
-                        var user = ua.User;
-                        if (address != null)
-                        {
-                            user.AddAddress(address);
-                        }
-                        return user;
-                    })
+                    user => user.Contact.Addresses.DefaultIfEmpty(),
+                    (user, address) => user)
                 .ToList();
             Assert.Equal(5, searchedUsers.Count());
 

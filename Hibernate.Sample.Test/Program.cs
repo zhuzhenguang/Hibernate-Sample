@@ -29,8 +29,8 @@ namespace Hibernate.Sample.Test
                 //.TestInnerJoinWithIQueryable();
                 //.TestInnerJoinWithLinq();
                 //.TestLeftJoinWithHql();
-                //.TestLeftJoinWithIQueryable();
-                .TestRightJoinWithHql();
+                .TestLeftJoinWithIQueryable();
+                //.TestRightJoinWithHql();
 
             Console.ReadLine();
         }
@@ -401,18 +401,10 @@ namespace Hibernate.Sample.Test
                     addresses,
                     user => user,
                     address => address.User,
-                    (user, addressList) => new { User = user, Addresses = addressList })
+                    (user, addressList) => new User(user, addressList.ToArray()))
                 .SelectMany(
-                    ua => ua.Addresses.DefaultIfEmpty(),
-                    (ua, address) =>
-                    {
-                        var user = ua.User;
-                        if (address != null)
-                        {
-                            user.AddAddress(address);
-                        }
-                        return user;
-                    })
+                    user => user.Contact.Addresses.DefaultIfEmpty(),
+                    (user, address) => user)
                 .ToList();
         }
 
