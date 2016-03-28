@@ -1,9 +1,9 @@
 ﻿using System;
 using System.IO;
-using FluentNHibernate.Conventions;
 using Hibernate.Sample.Test.Domain;
 using NHibernate;
 using NHibernate.Cfg;
+using NHibernate.Util;
 
 namespace Hibernate.Sample.Test.Common
 {
@@ -57,7 +57,7 @@ namespace Hibernate.Sample.Test.Common
         {
             var queryGroup = session.CreateQuery("from Hibernate.Sample.Test.Domain.Group");
             var groups = queryGroup.List<Group>();
-            if (groups.IsEmpty())
+            if (!groups.Any())
             {
                 return;
             }

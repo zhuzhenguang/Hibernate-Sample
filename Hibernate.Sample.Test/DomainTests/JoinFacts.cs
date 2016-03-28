@@ -1,4 +1,5 @@
-﻿using System.Linq;
+﻿using System.Collections.Generic;
+using System.Linq;
 using Hibernate.Sample.Test.Common;
 using Hibernate.Sample.Test.Domain;
 using NHibernate.Linq;

@@ -3,13 +3,14 @@ using System.Linq;
 using Hibernate.Sample.Test.Common;
 using Hibernate.Sample.Test.Domain;
 using log4net;
+using NHibernate.Criterion;
 using NHibernate.Linq;
 
 namespace Hibernate.Sample.Test
 {
     public class Program : TestBase
     {
-        private static ILog logger = LogManager.GetLogger(typeof (Program));
+        private static readonly ILog Logger = LogManager.GetLogger(typeof (Program));
 
         public static void Main()
         {
@@ -21,7 +22,7 @@ namespace Hibernate.Sample.Test
                 //.TestItem3();
                 //.TestUserWithResume();
                 //.TestUserWithDifferentFetchMethod();
-                //.TesteUserWithBatchLoading();
+                //.TestUserWithBatchLoading();
                 //.TestPersistent();
                 //.TestDetached();
                 //.TestPersistenceException();
@@ -29,8 +30,10 @@ namespace Hibernate.Sample.Test
                 //.TestInnerJoinWithIQueryable();
                 //.TestInnerJoinWithLinq();
                 //.TestLeftJoinWithHql();
-                .TestLeftJoinWithIQueryable();
+                //.TestLeftJoinWithIQueryable();
                 //.TestRightJoinWithHql();
+                //.TestFirstLevelSessionCache();
+                .TestSecondLevelCache();
 
             Console.ReadLine();
         }
@@ -71,8 +74,8 @@ namespace Hibernate.Sample.Test
             }
 
             var user2 = GetSession().Get<User>(user.Id);
-            logger.Info(user2.Passport.Serial);
-            logger.Info(user2.Passport.Expiry);
+            Logger.Info(user2.Passport.Serial);
+            Logger.Info(user2.Passport.Expiry);
         }
 
         private void TestInsertUserGroup()
@@ -232,7 +235,7 @@ namespace Hibernate.Sample.Test
         }
 
         // Batch Load
-        private void TesteUserWithBatchLoading()
+        private void TestUserWithBatchLoading()
         {
             DeleteAllTalbes();
 
@@ -418,21 +421,78 @@ namespace Hibernate.Sample.Test
             var users = session.CreateQuery("from User user right join fetch user.Contact.Addresses").List<User>();
         }
 
+        private void TestFirstLevelSessionCache()
+        {
+            DeleteAllTalbes();
+            PrepareUser2();
+
+            using (var session = GetSession())
+            {
+                var user1 = session.Get<User2>(1L);
+                var user2 = session.Get<User2>(1L);
+                session.CreateCriteria<User2>().Add(new InExpression("Id", new object[] {1L})).List<User2>();
+
+                Console.WriteLine("===================================");
+
+                var users1 = session.CreateQuery("from User2").List<User2>();
+                var users2 = session.CreateQuery("from User2").List<User2>();
+            }
+
+            using (var session = GetSession())
+            {
+                var user1 = session.Get<User2>(1L);
+                session.Evict(user1);
+                var user2 = session.Get<User2>(1L);
+            }
+        }
+
+        private void TestSecondLevelCache()
+        {
+            DeleteAllTalbes();
+            PrepareUser2();
+
+            using (var session = GetSession())
+            {
+                var user1 = session.Get<User2>(1L);
+            }
+
+            using (var session = GetSession())
+            {
+                var user1 = session.Get<User2>(1L);
+            }
+        }
+
+        private void PrepareUser2()
+        {
+            Console.WriteLine("=========================insert data start=========================");
+            var user2 = new User2 {Id = 1, Name = "Zhu"};
+
+            using (var session = GetSession())
+            using (var tx = session.BeginTransaction())
+            {
+                session.Save(user2);
+                tx.Commit();
+            }
+
+            Console.WriteLine("=========================insert data end===========================");
+            Console.WriteLine();
+        }
+
         private void PrepareUserAddressData()
         {
             Console.WriteLine("=========================insert data start=========================");
             var user1 = new User("Zhu");
-            user1.AddAddress(new Address { AddressDetail = "Shanghai", User = user1 });
-            user1.AddAddress(new Address { AddressDetail = "Beijing", User = user1 });
+            user1.AddAddress(new Address {AddressDetail = "Shanghai", User = user1});
+            user1.AddAddress(new Address {AddressDetail = "Beijing", User = user1});
 
             var user2 = new User("Jiao");
-            user2.AddAddress(new Address { AddressDetail = "GuangZhou", User = user2 });
+            user2.AddAddress(new Address {AddressDetail = "GuangZhou", User = user2});
 
             var user3 = new User("ZhuZhu");
             var user4 = new User("JiaoJiao");
-            var address = new Address { AddressDetail = "Hongkongs" };
+            var address = new Address {AddressDetail = "Hongkongs"};
 
-            var session = GetSession();
+            using (var session = GetSession())
             using (var tx = session.BeginTransaction())
             {
                 session.Save(user1);
@@ -442,8 +502,7 @@ namespace Hibernate.Sample.Test
                 session.Save(address);
                 tx.Commit();
             }
-            session.Close();
-            Console.WriteLine("=========================insert data end=========================");
+            Console.WriteLine("=========================insert data end===========================");
             Console.WriteLine();
         }
     }
