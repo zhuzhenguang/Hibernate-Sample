@@ -247,7 +247,7 @@ namespace Hibernate.Sample.Test
             var user1 = new User("Zhu");
             var user2 = new User("ZhuZhu");
             var address1 = new Address {ZipCode = "100101", AddressDetail = "Beijing Dongzhimen", User = user1};
-            var address2 = new Address {ZipCode = "100102", AddressDetail = "Beijing Xizhimen", User = user1};
+            var address2 = new Address {ZipCode = "100102", AddressDetail = "Beijing Xizhimen", User = user2};
             user1.AddAddress(address1);
             user2.AddAddress(address2);
 
