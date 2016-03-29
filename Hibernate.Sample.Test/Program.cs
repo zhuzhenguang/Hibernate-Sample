@@ -1,5 +1,7 @@
 ﻿using System;
 using System.Linq;
+using System.Threading;
+using System.Threading.Tasks;
 using Hibernate.Sample.Test.Common;
 using Hibernate.Sample.Test.Domain;
 using log4net;
@@ -33,7 +35,10 @@ namespace Hibernate.Sample.Test
                 //.TestLeftJoinWithIQueryable();
                 //.TestRightJoinWithHql();
                 //.TestFirstLevelSessionCache();
-                .TestSecondLevelCache();
+                //.TestSecondLevelCache();
+                //.TestReadCommitted();
+                //.TestRepeatableRead();
+                .TestSerializable();
 
             Console.ReadLine();
         }
@@ -460,6 +465,105 @@ namespace Hibernate.Sample.Test
             {
                 var user1 = session.Get<User2>(1L);
             }
+        }
+
+        // ReadUncommitted -> ReadCommitted(sqlserver default) RepeatableRead Serializable
+        private void TestReadCommitted()
+        {
+            DeleteAllTalbes();
+
+            new Task(() =>
+            {
+                Thread.Sleep(1000);
+                var session2 = GetSession();
+                var tx2 = session2.BeginTransaction();
+                var user = session2.Query<User2>().ToList();
+                tx2.Commit();
+                Console.WriteLine("user's count is: " + user.Count);
+            }).Start();
+
+            new Task(() =>
+            {
+                var session1 = GetSession();
+                var tx1 = session1.BeginTransaction();
+
+                session1.Save(new User2 { Id = 1, Name = "Zhu" });
+                session1.Flush();
+
+                Thread.Sleep(2000);
+                Console.WriteLine("another transaction save completed");
+                tx1.Rollback();    
+            }).Start();
+        }
+
+        private void TestRepeatableRead()
+        {
+            DeleteAllTalbes();
+            PrepareUser2();
+
+            new Task(() =>
+            {
+                Thread.Sleep(1000);
+                var session2 = GetSession();
+                using (var tx2 = session2.BeginTransaction())
+                {
+                    var user2 = session2.Get<User2>(1L);
+                    user2.Name = "Jiao";
+                    session2.Update(user2);
+                    tx2.Commit();
+                    Console.WriteLine(Thread.CurrentThread.ManagedThreadId + ": " + user2.Name);
+                }
+            }).Start();
+
+            new Task(() =>
+            {
+                var session1 = GetSession();
+                var tx1 = session1.BeginTransaction();
+
+                var user1 = session1.Get<User2>(1L);
+                Console.WriteLine(Thread.CurrentThread.ManagedThreadId + ": " + user1.Name);
+                session1.Clear();
+
+                Thread.Sleep(3000);
+
+                var user3 = session1.Get<User2>(1L);
+                Console.WriteLine(Thread.CurrentThread.ManagedThreadId + ": " + user3.Name);
+
+                tx1.Commit();   
+            }).Start();
+        }
+
+        private void TestSerializable()
+        {
+            DeleteAllTalbes();
+
+            new Task(() =>
+            {
+                Thread.Sleep(1000);
+                var session2 = GetSession();
+                using (var tx2 = session2.BeginTransaction())
+                {
+                    session2.Save(new User2 {Id = 1, Name = "Zhu"});
+                    tx2.Commit();
+                }
+            }).Start();
+
+            new Task(() =>
+            {
+                var session1 = GetSession();
+                var tx1 = session1.BeginTransaction();
+
+                var users1 = session1.Query<User2>().ToList();
+                Console.WriteLine(Thread.CurrentThread.ManagedThreadId + ": " + users1.Count);
+                session1.Clear();
+
+                Thread.Sleep(3000);
+
+                var users3 = session1.Query<User2>().ToList();
+                Console.WriteLine(Thread.CurrentThread.ManagedThreadId + ": " + users3.Count);
+
+                tx1.Commit();
+            }).Start();
         }
 
         private void PrepareUser2()
