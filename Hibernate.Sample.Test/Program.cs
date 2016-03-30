@@ -1,10 +1,12 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using Hibernate.Sample.Test.Common;
 using Hibernate.Sample.Test.Domain;
 using log4net;
+using NHibernate;
 using NHibernate.Criterion;
 using NHibernate.Linq;
 
@@ -38,7 +40,9 @@ namespace Hibernate.Sample.Test
                 //.TestSecondLevelCache();
                 //.TestReadCommitted();
                 //.TestRepeatableRead();
-                .TestSerializable();
+                //.TestSerializable();
+                //.TestPessimisticLock();
+                .TestOptimisticLock();
 
             Console.ReadLine();
         }
@@ -487,12 +491,12 @@ namespace Hibernate.Sample.Test
                 var session1 = GetSession();
                 var tx1 = session1.BeginTransaction();
 
-                session1.Save(new User2 { Id = 1, Name = "Zhu" });
+                session1.Save(new User2 {Id = 1, Name = "Zhu"});
                 session1.Flush();
 
                 Thread.Sleep(2000);
                 Console.WriteLine("another transaction save completed");
-                tx1.Rollback();    
+                tx1.Rollback();
             }).Start();
         }
 
@@ -529,7 +533,7 @@ namespace Hibernate.Sample.Test
                 var user3 = session1.Get<User2>(1L);
                 Console.WriteLine(Thread.CurrentThread.ManagedThreadId + ": " + user3.Name);
 
-                tx1.Commit();   
+                tx1.Commit();
             }).Start();
         }
 
@@ -563,6 +567,73 @@ namespace Hibernate.Sample.Test
                 Console.WriteLine(Thread.CurrentThread.ManagedThreadId + ": " + users3.Count);
 
                 tx1.Commit();
+            }).Start();
+        }
+
+        private void TestPessimisticLock()
+        {
+            DeleteAllTalbes();
+            PrepareUser2();
+
+            new Task(() =>
+            {
+                var session1 = GetSession();
+                var tx1 = session1.BeginTransaction();
+
+                var user1 = session1.CreateQuery("from User2 user where user.Id = :id")
+                    .SetParameter("id", 1L)
+                    .SetLockMode("user", LockMode.Upgrade)
+                    .UniqueResult<User2>();
+
+                Thread.Sleep(3000);
+
+                Console.WriteLine(Thread.CurrentThread.ManagedThreadId + ": " + user1.Name);
+                tx1.Commit();
+            }).Start();
+
+            new Task(() =>
+            {
+                Thread.Sleep(1000);
+                var session1 = GetSession();
+                using (var tx1 = session1.BeginTransaction())
+                {
+                    var user2 = session1.Get<User2>(1L);
+                    user2.Name = "Jiao";
+                    session1.Update(user2);
+                    tx1.Commit();
+                }
+                Console.WriteLine("update completed!");
+            }).Start();
+        }
+
+        private void TestOptimisticLock()
+        {
+            DeleteAllTalbes();
+            PrepareUser2();
+
+            new Task(() =>
+            {
+                var session1 = GetSession();
+                using (var tx = session1.BeginTransaction())
+                {
+                    var user1 = session1.Get<User2>(1L);
+                    Thread.Sleep(1000);
+                    user1.Name = "Jiao";
+                    tx.Commit();
+                }
+                
+            }).Start();
+
+            new Task(() =>
+            {
+                var session1 = GetSession();
+                using (var tx = session1.BeginTransaction())
+                {
+                    var user1 = session1.Get<User2>(1L);
+                    Thread.Sleep(1000);
+                    user1.Name = "ZhuZhu";
+                    tx.Commit();
+                }
             }).Start();
         }
 

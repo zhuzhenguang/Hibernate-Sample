@@ -84,3 +84,5 @@ create table t_user2(
 );
 
 alter table t_address alter column user_id bigint null;
+
+alter table t_user2 add version bigint;
