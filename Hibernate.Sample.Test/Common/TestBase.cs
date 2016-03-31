@@ -74,5 +74,10 @@ namespace Hibernate.Sample.Test.Common
         {
             return _sessionFactory.OpenSession();
         }
+
+        protected ISessionFactory GetSessionFactory()
+        {
+            return _sessionFactory;
+        }
     }
 }

@@ -2,7 +2,7 @@
 
 <hibernate-mapping xmlns="urn:nhibernate-mapping-2.2">
   <class name="User2" table="t_user2" dynamic-update="true" dynamic-insert="true" optimistic-lock="version">
-    <cache usage="read-write"/>
+<!--    <cache usage="read-write"/>-->
 
     <id name="Id" column="Id">
     </id>

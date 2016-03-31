@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
@@ -42,7 +41,11 @@ namespace Hibernate.Sample.Test
                 //.TestRepeatableRead();
                 //.TestSerializable();
                 //.TestPessimisticLock();
-                .TestOptimisticLock();
+                //.TestOptimisticLock();
+                //.TestListUser();
+                //.TestEnumerableUser();
+                //.TestEnumeralbeUserAfterList();
+                .TestQueryUserByLinq();
 
             Console.ReadLine();
         }
@@ -637,6 +640,80 @@ namespace Hibernate.Sample.Test
             }).Start();
         }
 
+        private void TestListUser()
+        {
+            DeleteAllTalbes();
+            PrepareUser2S();
+
+            using (var session = GetSession())
+            {
+                var users = session.CreateQuery("from User2 where Name like 'Z%'").List<User2>();
+            }    
+        }
+
+        private void TestEnumerableUser()
+        {
+            DeleteAllTalbes();
+            PrepareUser2S();
+
+            using (var session = GetSession())
+            {
+                var users = session.CreateQuery("from User2 where Name like 'Z%'").Enumerable<User2>();
+                foreach (var user2 in users)
+                {
+                    Console.WriteLine(user2.Name);
+                }
+            }
+        }
+
+        private void TestEnumeralbeUserAfterList()
+        {
+            DeleteAllTalbes();
+            PrepareUser2S();
+
+            using (var session = GetSession())
+            {
+                var users1 = session.CreateQuery("from User2 where Name like 'Z%'").List<User2>();
+                var users2 = session.CreateQuery("from User2 where Name like 'Z%'").Enumerable<User2>();
+
+                foreach (var user2 in users2)
+                {
+                    Console.WriteLine(user2.Name);
+                }
+            }
+        }
+
+        private void TestQueryUserByLinq()
+        {
+            DeleteAllTalbes();
+            PrepareUser2S();
+
+            using (var session = GetSession())
+            {
+                var user = session.Query<User2>().Where(u => u.Name.StartsWith("Z")).ToList();
+                var user2 = session.Query<User2>().Where(u => u.Name.StartsWith("Z")).ToList();
+            }
+        }
+
+        private void ResolvePerformaceProblemUsingEnumerable()
+        {
+            DeleteAllTalbes();
+            PrepareUser2S();
+
+            using (var session = GetSession())
+            {
+                var users2 = session.CreateQuery("from User2 where Name like 'Z%'").Enumerable<User2>();
+
+                foreach (var user2 in users2)
+                {
+                    session.Evict(user2);
+                    GetSessionFactory().Evict(typeof(User2), user2.Id);
+
+                    Console.WriteLine(user2.Name);
+                }
+            }
+        }
+
         private void PrepareUser2()
         {
             Console.WriteLine("=========================insert data start=========================");
@@ -651,6 +728,18 @@ namespace Hibernate.Sample.Test
 
             Console.WriteLine("=========================insert data end===========================");
             Console.WriteLine();
+        }
+
+        private void PrepareUser2S()
+        {
+            var session = GetSession();
+            using (var tx = session.BeginTransaction())
+            {
+                session.Save(new User2 { Id = 1, Name = "Zhu" });
+                session.Save(new User2 { Id = 2, Name = "ZhuZhu" });
+                session.Save(new User2 { Id = 3, Name = "Jiao" });
+                tx.Commit();
+            }
         }
 
         private void PrepareUserAddressData()
