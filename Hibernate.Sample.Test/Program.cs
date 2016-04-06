@@ -45,7 +45,10 @@ namespace Hibernate.Sample.Test
                 //.TestListUser();
                 //.TestEnumerableUser();
                 //.TestEnumeralbeUserAfterList();
-                .TestQueryUserByLinq();
+                //.TestQueryUserByLinq();
+                //.TestQueryCache();
+                //.TestLazyLoadForEntity();
+                .TestThrowExceptionWhenLazyLoad();
 
             Console.ReadLine();
         }
@@ -711,6 +714,64 @@ namespace Hibernate.Sample.Test
 
                     Console.WriteLine(user2.Name);
                 }
+            }
+        }
+
+        private void TestQueryCache()
+        {
+            DeleteAllTalbes();
+            PrepareUser2();
+
+            using (var session = GetSession())
+            {
+                var query = session.CreateQuery("from User2 where Name like 'Z%'");
+                query.SetCacheable(true);
+
+                var users1 = query.List<User2>();
+                foreach (var user in users1)
+                {
+                    Console.WriteLine(user.Name);
+                }
+
+                Console.WriteLine("Second Query...");
+
+                var query2 = session.CreateQuery("from User2 where Name like 'Z%'");
+                query2.SetCacheable(true);
+
+                var users2 = query2.List<User2>();
+                foreach (var user in users2)
+                {
+                    Console.WriteLine(user.Name);
+                }
+            }
+        }
+
+        private void TestLazyLoadForEntity()
+        {
+            DeleteAllTalbes();
+            PrepareUser2S();
+
+            using (var session = GetSession())
+            {
+                var user2 = session.Load<User2>(1L);
+                Console.WriteLine("load completed");
+                Console.WriteLine(user2.Name);
+            }
+        }
+
+        private void TestThrowExceptionWhenLazyLoad()
+        {
+            DeleteAllTalbes();
+            PrepareUser2S();
+
+            using (var session = GetSession())
+            {
+                var user2 = session.Load<User2>(1L);
+
+                new Task(() =>
+                {
+                    Console.WriteLine(user2.Name);
+                }).Start();
             }
         }
 
