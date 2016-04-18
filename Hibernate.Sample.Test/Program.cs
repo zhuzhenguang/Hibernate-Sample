@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
@@ -48,7 +49,9 @@ namespace Hibernate.Sample.Test
                 //.TestQueryUserByLinq();
                 //.TestQueryCache();
                 //.TestLazyLoadForEntity();
-                .TestThrowExceptionWhenLazyLoad();
+                //.TestThrowExceptionWhenLazyLoad();
+                //.TestLazyLoadForCollection();
+                .TestLazyLoadForCache();
 
             Console.ReadLine();
         }
@@ -355,7 +358,7 @@ namespace Hibernate.Sample.Test
         {
             DeleteAllTalbes();
 
-            PrepareUserAddressData();
+            PrepareUserAddressDataForJoin();
 
             var session = GetSession();
             var users =
@@ -370,7 +373,7 @@ namespace Hibernate.Sample.Test
         {
             DeleteAllTalbes();
 
-            PrepareUserAddressData();
+            PrepareUserAddressDataForJoin();
 
             var session = GetSession();
             var users = session.Query<User>();
@@ -389,7 +392,7 @@ namespace Hibernate.Sample.Test
         {
             DeleteAllTalbes();
 
-            PrepareUserAddressData();
+            PrepareUserAddressDataForJoin();
 
             var session = GetSession();
             var users = session.Query<User>().Where(user => user.Contact.Addresses.Count > 0).ToList();
@@ -399,7 +402,7 @@ namespace Hibernate.Sample.Test
         {
             DeleteAllTalbes();
 
-            PrepareUserAddressData();
+            PrepareUserAddressDataForJoin();
 
             var session = GetSession();
             var users = session.CreateQuery("from User user left join fetch user.Contact.Addresses").List<User>();
@@ -409,7 +412,7 @@ namespace Hibernate.Sample.Test
         {
             DeleteAllTalbes();
 
-            PrepareUserAddressData();
+            PrepareUserAddressDataForJoin();
 
             var session = GetSession();
             var addresses = session.Query<Address>().ToList();
@@ -430,7 +433,7 @@ namespace Hibernate.Sample.Test
         {
             DeleteAllTalbes();
 
-            PrepareUserAddressData();
+            PrepareUserAddressDataForJoin();
 
             var session = GetSession();
             var users = session.CreateQuery("from User user right join fetch user.Contact.Addresses").List<User>();
@@ -775,6 +778,51 @@ namespace Hibernate.Sample.Test
             }
         }
 
+        private void TestLazyLoadForCollection()
+        {
+            DeleteAllTalbes();
+            PrepareUserAddress();
+
+            ISet<Address> addresses;
+            using (var session = GetSession())
+            {
+                var user = session.Query<User>().Single(u => u.Name.LastName == "Zhu");
+                Console.WriteLine(user.Name);
+                addresses = user.Contact.Addresses;
+                Console.WriteLine(addresses.GetType().FullName);
+            }
+
+            var addressArray = addresses.ToArray();
+        }
+
+        private void TestLazyLoadForCache()
+        {
+            DeleteAllTalbes();
+            var userId = PrepareUserAddress();
+
+            using (var session = GetSession())
+            {
+                var user = session.Load<User>(userId);
+                var addresses = user.Contact.Addresses;
+                foreach (var address in addresses)
+                {
+                    Console.WriteLine(address.AddressDetail);
+                }
+            }
+
+            Console.WriteLine("---------Second Query---------");
+
+            using (var session2 = GetSession())
+            {
+                var user = session2.Load<User>(userId);
+                var addresses = user.Contact.Addresses;
+                foreach (var address in addresses)
+                {
+                    Console.WriteLine(address.AddressDetail);
+                }
+            }
+        }
+
         private void PrepareUser2()
         {
             Console.WriteLine("=========================insert data start=========================");
@@ -803,7 +851,7 @@ namespace Hibernate.Sample.Test
             }
         }
 
-        private void PrepareUserAddressData()
+        private void PrepareUserAddressDataForJoin()
         {
             Console.WriteLine("=========================insert data start=========================");
             var user1 = new User("Zhu");
@@ -829,6 +877,28 @@ namespace Hibernate.Sample.Test
             }
             Console.WriteLine("=========================insert data end===========================");
             Console.WriteLine();
+        }
+
+        private long PrepareUserAddress()
+        {
+            Console.WriteLine("=========================insert data start=========================");
+
+            var user = new User("Zhu");
+            user.AddAddress(new Address { AddressDetail = "Shanghai", User = user });
+            user.AddAddress(new Address { AddressDetail = "Beijing", User = user });
+            user.AddAddress(new Address { AddressDetail = "GuangZhou", User = user });
+
+            using (var session = GetSession())
+            using (var tx = session.BeginTransaction())
+            {
+                
+                session.Save(user);
+                tx.Commit();
+            }
+
+            Console.WriteLine("=========================insert data end===========================");
+            Console.WriteLine();
+            return user.Id;
         }
     }
 }

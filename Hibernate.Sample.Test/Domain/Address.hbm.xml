@@ -2,6 +2,7 @@
 
 <hibernate-mapping xmlns="urn:nhibernate-mapping-2.2">
   <class name="Address" table="t_address" dynamic-update="false" dynamic-insert="false">
+    <!--<cache usage="read-write"/>-->
     <id name="Id" column="Id">
       <generator class="identity" />
     </id>
