@@ -51,7 +51,8 @@ namespace Hibernate.Sample.Test
                 //.TestLazyLoadForEntity();
                 //.TestThrowExceptionWhenLazyLoad();
                 //.TestLazyLoadForCollection();
-                .TestLazyLoadForCache();
+                //.TestLazyLoadForCache();
+                .TestLazyLoadForFetch();
 
             Console.ReadLine();
         }
@@ -793,6 +794,33 @@ namespace Hibernate.Sample.Test
             }
 
             var addressArray = addresses.ToArray();
+        }
+
+        private void TestLazyLoadForFetch()
+        {
+            DeleteAllTalbes();
+            PrepareUserAddress();
+
+            User user;
+            using (var session = GetSession())
+            {
+                /*user = session.CreateQuery("from User where Name.LastName = 'Zhu'").UniqueResult<User>();
+                Console.WriteLine(user.Name);
+                NHibernateUtil.Initialize(user.Contact.Addresses);*/
+
+                user = session.Query<User>()
+                    .Where(u => u.Name.LastName == "Zhu")
+                    .Fetch(u => u.Contact).ThenFetchMany(c => c.Addresses)
+                    .Single();
+
+                /*user = session.QueryOver<User>()
+                    .Where(u => u.Name.LastName == "Zhu")
+                    .Fetch(u => u.Contact.Addresses)
+                    .Eager
+                    .SingleOrDefault<User>();*/
+            }
+
+            var addresses = user.Contact.Addresses.ToArray();
         }
 
         private void TestLazyLoadForCache()

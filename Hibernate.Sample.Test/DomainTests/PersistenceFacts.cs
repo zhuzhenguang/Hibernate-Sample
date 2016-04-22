@@ -85,18 +85,25 @@ namespace Hibernate.Sample.Test.DomainTests
             User user;
             using (var session = GetSession())
             {
-                user = session.CreateQuery("from User where Name.LastName = 'Zhu'").UniqueResult<User>();
+                /*user = session.CreateQuery("from User where Name.LastName = 'Zhu'").UniqueResult<User>();
                 Console.WriteLine(user.Name);
-                NHibernateUtil.Initialize(user.Contact.Addresses);
+                NHibernateUtil.Initialize(user.Contact.Addresses);*/
 
                 /*user = session.Query<User>()
                     .Where(u => u.Name.LastName == "Zhu")
                     .Fetch(u => u.Contact.Addresses)
-                    .Single();*/
-                Console.WriteLine(user.Name);
+                    .FirstOrDefault();*/
+
+                user = session.QueryOver<User>()
+                    .Where(u => u.Name.LastName == "Zhu")
+                    .Fetch(u => u.Contact.Addresses)
+                    .Eager
+                    .SingleOrDefault<User>();
             }
 
             var addresses = user.Contact.Addresses;
+            var telephone = user.Contact.Telephone;
+            Assert.Equal("123", telephone);
             Assert.Equal("Shanghai", addresses.First().AddressDetail);
         }
 
@@ -119,7 +126,7 @@ namespace Hibernate.Sample.Test.DomainTests
             using (var session = GetSession())
             using (var tx = session.BeginTransaction())
             {
-                var user = new User("Zhu");
+                var user = new User("Zhu") {Contact = {Telephone = "123"}};
                 user.AddAddress(new Address { AddressDetail = "Shanghai", User = user });
                 user.AddAddress(new Address { AddressDetail = "Beijing", User = user });
                 user.AddAddress(new Address { AddressDetail = "GuangZhou", User = user });

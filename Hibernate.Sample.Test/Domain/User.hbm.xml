@@ -12,6 +12,7 @@
     </component>
 
     <component name="Contact" class="Hibernate.Sample.Test.Domain.Contact">
+      <property name="Telephone"/>
       <set
         name="Addresses"
         table="t_address"
