@@ -4,6 +4,7 @@ using System.Linq;
 using Hibernate.Sample.Test.Common;
 using Hibernate.Sample.Test.Domain;
 using NHibernate;
+using NHibernate.Criterion;
 using NHibernate.Linq;
 using Xunit;
 
@@ -94,11 +95,16 @@ namespace Hibernate.Sample.Test.DomainTests
                     .Fetch(u => u.Contact.Addresses)
                     .FirstOrDefault();*/
 
-                user = session.QueryOver<User>()
+                user = session.CreateCriteria<User>()
+                    .Add(Restrictions.Eq("Name.LastName", "Zhu"))
+                    .SetFetchMode("Contact.Addresses", FetchMode.Eager)
+                    .UniqueResult<User>();
+
+                /*user = session.QueryOver<User>()
                     .Where(u => u.Name.LastName == "Zhu")
                     .Fetch(u => u.Contact.Addresses)
                     .Eager
-                    .SingleOrDefault<User>();
+                    .SingleOrDefault<User>();*/
             }
 
             var addresses = user.Contact.Addresses;

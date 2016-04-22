@@ -808,10 +808,15 @@ namespace Hibernate.Sample.Test
                 Console.WriteLine(user.Name);
                 NHibernateUtil.Initialize(user.Contact.Addresses);*/
 
-                user = session.Query<User>()
+                /*user = session.Query<User>()
                     .Where(u => u.Name.LastName == "Zhu")
                     .Fetch(u => u.Contact).ThenFetchMany(c => c.Addresses)
-                    .Single();
+                    .Single();*/
+
+                user = session.CreateCriteria<User>()
+                    .Add(Restrictions.Eq("Name.LastName", "Zhu"))
+                    .SetFetchMode("Contact.Addresses", FetchMode.Eager)
+                    .UniqueResult<User>();
 
                 /*user = session.QueryOver<User>()
                     .Where(u => u.Name.LastName == "Zhu")
