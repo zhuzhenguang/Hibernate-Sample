@@ -4,6 +4,7 @@
     {
         public virtual long Id { get; set; }
         public virtual string Name { get; set; }
+        public virtual string Resume { get; set; }
         public virtual long Version { get; set; }
 
         protected bool Equals(User2 other)

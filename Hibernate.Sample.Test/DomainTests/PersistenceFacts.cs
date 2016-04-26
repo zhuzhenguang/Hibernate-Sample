@@ -113,6 +113,23 @@ namespace Hibernate.Sample.Test.DomainTests
             Assert.Equal("Shanghai", addresses.First().AddressDetail);
         }
 
+        [Fact]
+        public void should_lazy_load_resume()
+        {
+            PrepareUserWithResume();
+
+            User2 user;
+            using (var session = GetSession())
+            {
+                //user = session.Load<User2>(1L);
+                user = session.CreateQuery("from User2 where id = 1").UniqueResult<User2>();
+            }
+
+            Assert.Equal("Zhu", user.Name);
+            Assert.False(NHibernateUtil.IsPropertyInitialized(user, "Resume"));
+            Assert.Throws<LazyInitializationException>(() => user.Resume);
+        }
+
         private void PrepareUser2()
         {
             var session = GetSession();
@@ -142,6 +159,18 @@ namespace Hibernate.Sample.Test.DomainTests
 
             Console.WriteLine("=========================insert data end===========================");
             Console.WriteLine();
+        }
+
+        private void PrepareUserWithResume()
+        {
+            var user = new User2 {Id = 1, Name = "Zhu", Resume = "I am Zhu."};
+
+            using (var session = GetSession())
+            using (var tx = session.BeginTransaction())
+            {
+                session.Save(user);
+                tx.Commit();
+            }
         }
     }
 }

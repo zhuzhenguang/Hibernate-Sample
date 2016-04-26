@@ -52,7 +52,13 @@ namespace Hibernate.Sample.Test
                 //.TestThrowExceptionWhenLazyLoad();
                 //.TestLazyLoadForCollection();
                 //.TestLazyLoadForCache();
-                .TestLazyLoadForFetch();
+                //.TestLazyLoadForFetch();
+                //.TestLazyLoadForProperty();
+                //.TestSave();
+                //.TestUpdate();
+                //.TestMerge();
+                //.TestPersist();
+                .TestLock();
 
             Console.ReadLine();
         }
@@ -853,6 +859,166 @@ namespace Hibernate.Sample.Test
                 {
                     Console.WriteLine(address.AddressDetail);
                 }
+            }
+        }
+
+        private void TestLazyLoadForProperty()
+        {
+            DeleteAllTalbes();
+            PrepareUser2WithResume();
+
+            using (var session = GetSession())
+            {
+                var user = session.Load<User2>(1L);
+                //var user = session.CreateQuery("from User2").UniqueResult<User2>();
+                var name = user.Name;
+                var resume = user.Resume;
+            }
+        }
+
+        // #1 find saved object in session
+        // #2 liftcycle onSave/validation validate()/interceptor onSave()
+        // #3 insert sql
+        // #4 set user id
+        // #5 set user to session
+        // #6 cascade
+        private void TestSave()
+        {
+            DeleteAllTalbes();
+
+            var user = new User2 {Id = 1, Name = "Zhu"};
+
+            using (var session = GetSession())
+            using (var tx = session.BeginTransaction())
+            {
+                session.Save(user);
+
+                Console.WriteLine("save completed {0}", user.Id);
+                tx.Commit();
+            }
+
+            /*using (var session = GetSession())
+            {
+                session.Save(user);
+                session.Flush();
+            }*/
+        }
+
+        // #1 find updated object in session
+        // #2 initialize object status info, save it in session, detached -> persistent
+        private void TestUpdate()
+        {
+            DeleteAllTalbes();
+
+            var user = new User2 { Id = 1, Name = "Zhu" };
+
+            using (var session = GetSession())
+            using (var tx = session.BeginTransaction())
+            {
+                session.Save(user);
+
+                Console.WriteLine("save completed");
+                tx.Commit();
+            }
+
+            using (var session = GetSession())
+            using (var tx = session.BeginTransaction())
+            {
+                session.Update(user);
+                user.Resume = "I am Zhu";
+                tx.Commit();
+            }
+        }
+
+        private void TestSaveOrUpdate()
+        {
+            DeleteAllTalbes();
+
+            var user = new User2 {Id = 1, Name = "Zhu"};
+
+            using (var session = GetSession())
+            using (var tx = session.BeginTransaction())
+            {
+                session.SaveOrUpdate(user);
+
+                Console.WriteLine("save completed");
+                tx.Commit();
+            }
+        }
+
+        private void TestMerge()
+        {
+            DeleteAllTalbes();
+
+            var user = new User2 { Id = 1, Name = "Zhu" };
+
+            using (var session = GetSession())
+            using (var tx = session.BeginTransaction())
+            {
+                session.Save(user);
+
+                Console.WriteLine("save completed");
+
+                //session.Update(new User2 {Id = 1, Name = "Jiao"});
+                session.Merge(new User2 {Id = 1, Name = "Jiao"});
+                tx.Commit();
+            }
+        }
+
+        // ?
+        private void TestPersist()
+        {
+            DeleteAllTalbes();
+
+            using (var session = GetSession())
+            {
+                var user = new User("Zhu");
+                session.Persist(user);
+
+                Console.WriteLine("saved. {0}", user.Id);
+                
+                session.Flush();
+            }
+
+            using (var session = GetSession())
+            {
+                var user = new User("Zhu");
+                session.Save(user);
+
+                Console.WriteLine("saved. {0}", user.Id);
+
+                session.Flush();
+            }
+        }
+
+        private void TestLock()
+        {
+            DeleteAllTalbes();
+
+            var user = new User2 { Id = 1, Name = "Zhu" };
+            using (var session = GetSession())
+            {
+                session.Save(user);
+                session.Flush();
+            }
+
+            using (var session = GetSession())
+            {
+                session.Lock(user, LockMode.None);
+                user.Name = "Jiao";
+                session.Flush();
+            }
+        }
+
+        private void PrepareUser2WithResume()
+        {
+            var user = new User2 { Id = 1, Name = "Zhu", Resume = "I am Zhu." };
+
+            using (var session = GetSession())
+            using (var tx = session.BeginTransaction())
+            {
+                session.Save(user);
+                tx.Commit();
             }
         }
 

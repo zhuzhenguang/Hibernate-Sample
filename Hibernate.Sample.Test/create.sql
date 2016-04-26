@@ -86,3 +86,7 @@ create table t_user2(
 alter table t_address alter column user_id bigint null;
 
 alter table t_user2 add version bigint;
+
+alter table t_user2 add resume nvarchar(4000) not null;
+
+alter table t_user2 alter column resume nvarchar(4000) null;
