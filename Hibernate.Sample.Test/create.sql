@@ -90,3 +90,14 @@ alter table t_user2 add version bigint;
 alter table t_user2 add resume nvarchar(4000) not null;
 
 alter table t_user2 alter column resume nvarchar(4000) null;
+
+create table t_user3(
+  id bigint identity(1,1) primary key,
+  name nvarchar(512)
+);
+
+create table t_address2(
+  id bigint identity(1,1) primary key,
+  detail nvarchar(512),
+  user_id bigint not null
+);

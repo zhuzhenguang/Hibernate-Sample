@@ -1,0 +1,22 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+
+<hibernate-mapping xmlns="urn:nhibernate-mapping-2.2">
+  <class name="User3" table="t_user3" dynamic-update="true" dynamic-insert="true">
+    <id name="Id" column="Id">
+      <generator class="identity" />
+    </id>
+
+    <property name="Name"/>
+
+    <set
+        name="Addresses"
+        table="t_address2"
+        cascade="all"
+        inverse="true"
+        outer-join="auto">
+      <key column="user_id"></key>
+      <one-to-many class="Address2" />
+    </set>
+
+  </class>
+</hibernate-mapping>

@@ -80,8 +80,9 @@ namespace Hibernate.Sample.Test.DomainTests
         {
             DeleteAllTalbes();
 
-            var user = new User("Zhu");
-            var address = new Address {ZipCode = "100101", AddressDetail = "Beijing Dongzhimen"};
+            var user = new User3("Zhu");
+            var address = new Address2 {Detail = "dongzhimen"};
+
             user.AddAddress(address);
 
             var session = GetSession();
@@ -92,8 +93,6 @@ namespace Hibernate.Sample.Test.DomainTests
             }
 
             Assert.True(user.Id > 0);
-            Assert.NotEmpty(user.Contact.Addresses);
-            Assert.True(user.Contact.Addresses.First().Id > 0);
         }
 
         [Fact]

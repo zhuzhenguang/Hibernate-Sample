@@ -80,6 +80,7 @@
     <Compile Include="DomainTests\JoinFacts.cs" />
     <Compile Include="DomainTests\PersistenceFacts.cs" />
     <Compile Include="DomainTests\UserFacts.cs" />
+    <Compile Include="Domain\Address2.cs" />
     <Compile Include="Domain\Address.cs" />
     <Compile Include="Domain\Group.cs" />
     <Compile Include="Domain\Item1.cs" />
@@ -88,6 +89,7 @@
     <Compile Include="Domain\Passport.cs" />
     <Compile Include="Domain\Role.cs" />
     <Compile Include="Domain\User.cs" />
+    <Compile Include="Domain\User3.cs" />
     <Compile Include="Domain\User2.cs" />
     <Compile Include="Domain\UserWithResume.cs" />
     <Compile Include="Program.cs" />
@@ -119,6 +121,13 @@
   </ItemGroup>
   <ItemGroup>
     <Content Include="create.sql" />
+    <EmbeddedResource Include="Domain\Address2.hbm.xml">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Domain\User3.hbm.xml">
+      <SubType>Designer</SubType>
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </EmbeddedResource>
     <EmbeddedResource Include="Domain\User2.hbm.xml">
       <SubType>Designer</SubType>
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>

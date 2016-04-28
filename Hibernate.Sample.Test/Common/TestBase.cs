@@ -28,6 +28,7 @@ namespace Hibernate.Sample.Test.Common
             {
                 "Passport", 
                 "Address", 
+                "Address2", 
                 "User", 
                 "Hibernate.Sample.Test.Domain.Group", 
                 "Hibernate.Sample.Test.Domain.Role",
@@ -35,7 +36,8 @@ namespace Hibernate.Sample.Test.Common
                 "Dvd1",
                 "Item2",
                 "Item3",
-                "User2"
+                "User2",
+                "User3"
             };
 
             var session = GetSession();
