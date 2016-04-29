@@ -77,6 +77,11 @@ namespace Hibernate.Sample.Test.Common
             return _sessionFactory.OpenSession();
         }
 
+        protected IStatelessSession GetStatelessSession()
+        {
+            return _sessionFactory.OpenStatelessSession();
+        }
+
         protected ISessionFactory GetSessionFactory()
         {
             return _sessionFactory;

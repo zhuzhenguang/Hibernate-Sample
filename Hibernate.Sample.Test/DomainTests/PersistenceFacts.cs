@@ -130,6 +130,24 @@ namespace Hibernate.Sample.Test.DomainTests
             Assert.Throws<LazyInitializationException>(() => user.Resume);
         }
 
+        [Fact]
+        public void should_batch_delete_user()
+        {
+            var users = BatchSaveUsers(3);
+
+            using (var session = GetSession())
+            using (var tx = session.BeginTransaction())
+            {
+                var query = session.CreateQuery("delete User");
+                query.ExecuteUpdate();
+
+                tx.Commit();
+
+                var user = session.Get<User>(users[0].Id);
+                Assert.Null(user);
+            }
+        }
+
         private void PrepareUser2()
         {
             var session = GetSession();
@@ -171,6 +189,38 @@ namespace Hibernate.Sample.Test.DomainTests
                 session.Save(user);
                 tx.Commit();
             }
+        }
+
+        private List<User> BatchSaveUsers(int userCount)
+        {
+            var userList = new List<User>();
+            for (var i = 0; i < userCount; i++)
+            {
+                var user = new User("Zhu" + i);
+                //var passport = new Passport{Serial = "1111", User = user};
+                //user.Passport = passport;
+                userList.Add(user);
+            }
+
+            using (var session = GetSession())
+            using (var tx = session.BeginTransaction())
+            {
+                for (var i = 0; i < userList.Count; i++)
+                {
+                    session.Save(userList[i]);
+
+                    if (i % 25 == 0)
+                    {
+                        session.Flush();
+                        session.Clear();
+                    }
+                }
+
+                tx.Commit();
+            }
+
+            Console.WriteLine("Save Completed!");
+            return userList;
         }
     }
 }

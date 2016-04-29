@@ -17,15 +17,20 @@ namespace Hibernate.Sample.Test.DomainTests
 
             var user = new User("Zhu");
 
-            var session = GetSession();
-            var transaction = session.BeginTransaction();
+            //var transaction = session.BeginTransaction();
 
-            using (session)
-            using (transaction)
+            using (var session2 = GetSession())
+            //using (transaction)
             {
-                session.Save(user);
-                session.Flush();
-                transaction.Commit();
+                session2.Save(user);
+                //session.Flush();
+                //transaction.Commit();
+            }
+
+            using (var session1 = GetSession())
+            {
+                var user1 = session1.Get<User>(user.Id);
+                Assert.True(user1.Id > 0);
             }
 
             Assert.True(user.Id > 0);
@@ -85,14 +90,10 @@ namespace Hibernate.Sample.Test.DomainTests
 
             user.AddAddress(address);
 
-            var session = GetSession();
-            using (var transaction = session.BeginTransaction())
+            using (var session = GetSession())
             {
-                session.Save(user);
-                transaction.Commit();
+                Assert.ThrowsAny<Exception>(() => session.Save(user));
             }
-
-            Assert.True(user.Id > 0);
         }
 
         [Fact]

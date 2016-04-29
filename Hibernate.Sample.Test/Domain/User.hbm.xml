@@ -21,7 +21,7 @@
         lazy="true"
         outer-join="false" 
         batch-size="10">
-        <cache usage="read-write"/>
+        <!--<cache usage="read-write"/>-->
         <key column="user_id"></key>
         <one-to-many class="Address" />
       </set>

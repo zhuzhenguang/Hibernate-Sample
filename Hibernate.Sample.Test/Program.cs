@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
@@ -58,7 +59,9 @@ namespace Hibernate.Sample.Test
                 //.TestUpdate();
                 //.TestMerge();
                 //.TestPersist();
-                .TestLock();
+                //.TestLock();
+                //.TestBatchCreate();
+                .TestBatchDelete();
 
             Console.ReadLine();
         }
@@ -1008,6 +1011,83 @@ namespace Hibernate.Sample.Test
                 user.Name = "Jiao";
                 session.Flush();
             }
+        }
+
+        private void TestBatchCreate()
+        {
+            DeleteAllTalbes();
+
+            var stopWatch = new Stopwatch();
+            stopWatch.Start();
+
+            BatchSaveUsers(10000);
+
+            var elapsedMilliseconds = stopWatch.ElapsedMilliseconds;
+            Console.WriteLine("elapse: {0}", elapsedMilliseconds);
+
+            Console.ReadLine();
+        }
+
+        private void BatchSaveUsers(int userCount)
+        {
+            var userList = new List<User>();
+            for (var i = 0; i < userCount; i++)
+            {
+                var user = new User("Zhu" + i);
+                userList.Add(user);
+            }
+
+            using (var session = GetSession())
+            using (var tx = session.BeginTransaction())
+            {
+                for (var i = 0; i < userList.Count; i++)
+                {
+                    session.Save(userList[i]);
+
+                    if (i%25 == 0)
+                    {
+                        session.Flush();
+                        session.Clear();
+                    }
+                }
+
+                tx.Commit();
+            }
+
+            Console.WriteLine("Save Completed!");
+        }
+
+        private void TestBatchDelete()
+        {
+            DeleteAllTalbes();
+
+            BatchSaveUsers(10000);
+
+            var stopWatch = new Stopwatch();
+            stopWatch.Start();
+            /*using (var session = GetSession())
+            using (var tx = session.BeginTransaction())
+            {
+                session.Delete("from User");
+                tx.Commit();
+            }*/
+
+            using (var session = GetSession())
+            using (var tx = session.BeginTransaction())
+            {
+                var users = session.CreateQuery("from User").Enumerable<User>();
+                foreach (var user in users)
+                {
+                    session.Delete(user);
+                }
+                //session.Delete("from User");
+                tx.Commit();
+            }
+            var elapsedMilliseconds = stopWatch.ElapsedMilliseconds;
+
+            Console.WriteLine("elapse: {0}", elapsedMilliseconds);
+
+            Console.ReadLine();
         }
 
         private void PrepareUser2WithResume()
