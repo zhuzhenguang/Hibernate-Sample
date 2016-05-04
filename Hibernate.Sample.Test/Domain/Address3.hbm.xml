@@ -1,0 +1,12 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+
+<hibernate-mapping xmlns="urn:nhibernate-mapping-2.2">
+  <class name="Address3" table="t_address3" dynamic-update="false" dynamic-insert="false">
+    <id name="Id" column="Id">
+      <generator class="identity" />
+    </id>
+
+    <property name="Detail" />
+    <property name="Type" />
+  </class>
+</hibernate-mapping>

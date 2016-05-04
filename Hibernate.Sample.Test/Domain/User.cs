@@ -31,10 +31,14 @@ namespace Hibernate.Sample.Test.Domain
 
         public virtual void AddAddress(Address address)
         {
+            address.User = this;
             Contact.Addresses.Add(address);
         }
 
-
+        public virtual void RemoveAddress(Address address)
+        {
+            Contact.Addresses.Remove(address);
+        }
     }
 
     public class Name
@@ -47,10 +51,10 @@ namespace Hibernate.Sample.Test.Domain
     {
         public Contact()
         {
-            Addresses = new HashSet<Address>();
+            Addresses = new List<Address>();
         }
 
         public virtual string Telephone { get; set; }
-        public virtual ISet<Address> Addresses { get; set; }
+        public virtual ICollection<Address> Addresses { get; set; }
     }
 }

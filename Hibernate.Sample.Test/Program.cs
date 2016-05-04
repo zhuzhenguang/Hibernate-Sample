@@ -60,8 +60,9 @@ namespace Hibernate.Sample.Test
                 //.TestMerge();
                 //.TestPersist();
                 //.TestLock();
-                //.TestBatchCreate();
-                .TestBatchDelete();
+                .TestBatchCreate();
+                //.TestBatchDelete();
+                //.TestBagDelete();
 
             Console.ReadLine();
         }
@@ -793,7 +794,7 @@ namespace Hibernate.Sample.Test
             DeleteAllTalbes();
             PrepareUserAddress();
 
-            ISet<Address> addresses;
+            ICollection<Address> addresses;
             using (var session = GetSession())
             {
                 var user = session.Query<User>().Single(u => u.Name.LastName == "Zhu");
@@ -1088,6 +1089,43 @@ namespace Hibernate.Sample.Test
             Console.WriteLine("elapse: {0}", elapsedMilliseconds);
 
             Console.ReadLine();
+        }
+
+        private void TestBagDelete()
+        {
+            DeleteAllTalbes();
+            var userId = PrepareUserWithSameAddresses();
+
+            using (var session = GetSession())
+            using (var tx = session.BeginTransaction())
+            {
+                var user = session.Load<User4>(userId);
+                user.Addresses.Remove(user.Addresses.First());
+                tx.Commit();
+            }
+
+            using (var session = GetSession())
+            {
+                var user = session.Load<User4>(userId);
+                Console.WriteLine(user.Addresses.Count);
+            }
+        }
+
+        private long PrepareUserWithSameAddresses()
+        {
+            var user = new User("Jiao");
+            user.AddAddress(new Address { AddressDetail = "dongzhimen" });
+            user.AddAddress(new Address { AddressDetail = "dongzhimen" });
+            user.AddAddress(new Address { AddressDetail = "dongzhimen" });
+
+            using (var session = GetSession())
+            {
+                session.Save(user);
+                session.Flush();
+            }
+
+            Console.WriteLine("==========end==========");
+            return user.Id;
         }
 
         private void PrepareUser2WithResume()

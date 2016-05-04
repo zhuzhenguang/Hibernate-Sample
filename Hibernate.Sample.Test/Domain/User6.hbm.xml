@@ -1,0 +1,17 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+
+<hibernate-mapping xmlns="urn:nhibernate-mapping-2.2">
+  <class name="User6" table="t_user" dynamic-update="true" dynamic-insert="true">
+    <id name="Id" column="Id">
+      <generator class="identity" />
+    </id>
+
+    <property name="LastName" column="last_name" />
+
+    <list name="Addresses" table="t_address4" lazy="true">
+      <key column="user_id"></key>
+      <index type="long" column="idx"/>
+      <element type="string" column="detail" />
+    </list>
+  </class>
+</hibernate-mapping>

@@ -75,6 +75,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Common\TestBase.cs" />
+    <Compile Include="DomainTests\CollectionFacts.cs" />
     <Compile Include="DomainTests\GroupRoleFacts.cs" />
     <Compile Include="DomainTests\ItemFacts.cs" />
     <Compile Include="DomainTests\JoinFacts.cs" />
@@ -82,6 +83,8 @@
     <Compile Include="DomainTests\UserFacts.cs" />
     <Compile Include="Domain\Address2.cs" />
     <Compile Include="Domain\Address.cs" />
+    <Compile Include="Domain\Address3.cs" />
+    <Compile Include="Domain\Address4.cs" />
     <Compile Include="Domain\Group.cs" />
     <Compile Include="Domain\Item1.cs" />
     <Compile Include="Domain\Item2.cs" />
@@ -91,6 +94,9 @@
     <Compile Include="Domain\User.cs" />
     <Compile Include="Domain\User3.cs" />
     <Compile Include="Domain\User2.cs" />
+    <Compile Include="Domain\User4.cs" />
+    <Compile Include="Domain\User5.cs" />
+    <Compile Include="Domain\User6.cs" />
     <Compile Include="Domain\UserWithResume.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
@@ -121,6 +127,24 @@
   </ItemGroup>
   <ItemGroup>
     <Content Include="create.sql" />
+    <EmbeddedResource Include="Domain\Address4.hbm.xml">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Domain\User6.hbm.xml">
+      <SubType>Designer</SubType>
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Domain\User5.hbm.xml">
+      <SubType>Designer</SubType>
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Domain\Address3.hbm.xml">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Domain\User4.hbm.xml">
+      <SubType>Designer</SubType>
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </EmbeddedResource>
     <EmbeddedResource Include="Domain\Address2.hbm.xml">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </EmbeddedResource>

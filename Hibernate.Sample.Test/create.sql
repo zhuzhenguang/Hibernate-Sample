@@ -101,3 +101,17 @@ create table t_address2(
   detail nvarchar(512),
   user_id bigint not null
 );
+
+create table t_address3(
+  id bigint identity(1,1) primary key,
+  detail nvarchar(512),
+  type nvarchar(512),
+  user_id bigint not null
+);
+
+create table t_address4(
+  id bigint identity(1,1) primary key,
+  detail nvarchar(512),
+  idx bigint,
+  user_id bigint not null
+);

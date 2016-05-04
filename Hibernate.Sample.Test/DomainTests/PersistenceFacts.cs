@@ -66,7 +66,7 @@ namespace Hibernate.Sample.Test.DomainTests
         {
             PrepareUserAddress();
 
-            ISet<Address> addresses;
+            ICollection<Address> addresses;
             using (var session = GetSession())
             {
                 //var user = session.Query<User>().Single(u => u.Name.LastName == "Zhu");

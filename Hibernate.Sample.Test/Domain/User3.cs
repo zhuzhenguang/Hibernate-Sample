@@ -6,12 +6,12 @@ namespace Hibernate.Sample.Test.Domain
     {
         public User3()
         {
+            Addresses = new HashSet<Address2>();
         }
 
-        public User3(string name)
+        public User3(string name) : this()
         {
             Name = name;
-            Addresses = new HashSet<Address2>();
         }
 
         public virtual long Id { get; set; }

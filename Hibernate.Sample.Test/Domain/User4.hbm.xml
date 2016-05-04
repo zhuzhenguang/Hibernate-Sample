@@ -1,0 +1,29 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+
+<hibernate-mapping xmlns="urn:nhibernate-mapping-2.2">
+  <class name="User4" table="t_user" dynamic-update="true" dynamic-insert="true">
+    <id name="Id" column="Id">
+      <generator class="identity" />
+    </id>
+
+    <property name="LastName" column="last_name" />
+
+    <!--<set name="Addresses" table="t_address" lazy="true">
+      <key column="user_id"></key>
+      <element type="string" column="address" />
+    </set>-->
+
+    <!--<bag name="Addresses" table="t_address" lazy="true">
+      <key column="user_id"></key>
+      <element type="string" column="address" />
+    </bag>-->
+
+    <idbag name="Addresses" table="t_address" lazy="true">
+      <collection-id type="long" column="id">
+        <generator class="identity"/>
+      </collection-id>
+      <key column="user_id"></key>
+      <element type="string" column="address" />
+    </idbag>
+  </class>
+</hibernate-mapping>
