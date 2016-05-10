@@ -75,6 +75,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Common\TestBase.cs" />
+    <Compile Include="DomainTests\CallFacts.cs" />
     <Compile Include="DomainTests\CollectionFacts.cs" />
     <Compile Include="DomainTests\GroupRoleFacts.cs" />
     <Compile Include="DomainTests\ItemFacts.cs" />

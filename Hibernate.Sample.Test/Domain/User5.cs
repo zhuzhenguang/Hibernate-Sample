@@ -2,6 +2,7 @@
 
 namespace Hibernate.Sample.Test.Domain
 {
+    // test for map
     public class User5
     {
         public User5()
